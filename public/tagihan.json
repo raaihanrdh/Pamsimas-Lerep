@@ -1,0 +1,102 @@
+[
+  {
+    "IdTagihan": 1,
+    "IdMeteran": "MT-001",
+    "BulanTagihan": "2024-01",
+    "TotalMeteranSebelumnya": 500,
+    "PenggunaanBulanIni": 50,
+    "TotalTagihan": 100000,
+    "StatusPembayaran": "Lunas",
+    "TanggalBayar": "2024-01-15"
+  },
+  {
+    "IdTagihan": 2,
+    "IdMeteran": "MT-002",
+    "BulanTagihan": "2024-01",
+    "TotalMeteranSebelumnya": 400,
+    "PenggunaanBulanIni": 60,
+    "TotalTagihan": 120000,
+    "StatusPembayaran": "Belum Lunas",
+    "TanggalBayar": null
+  },
+  {
+    "IdTagihan": 3,
+    "IdMeteran": "MT-003",
+    "BulanTagihan": "2024-01",
+    "TotalMeteranSebelumnya": 550,
+    "PenggunaanBulanIni": 45,
+    "TotalTagihan": 90000,
+    "StatusPembayaran": "Lunas",
+    "TanggalBayar": "2024-01-17"
+  },
+  {
+    "IdTagihan": 4,
+    "IdMeteran": "MT-004",
+    "BulanTagihan": "2024-02",
+    "TotalMeteranSebelumnya": 450,
+    "PenggunaanBulanIni": 30,
+    "TotalTagihan": 60000,
+    "StatusPembayaran": "Belum Lunas",
+    "TanggalBayar": null
+  },
+  {
+    "IdTagihan": 5,
+    "IdMeteran": "MT-005",
+    "BulanTagihan": "2024-02",
+    "TotalMeteranSebelumnya": 600,
+    "PenggunaanBulanIni": 55,
+    "TotalTagihan": 110000,
+    "StatusPembayaran": "Lunas",
+    "TanggalBayar": "2024-02-10"
+  },
+  {
+    "IdTagihan": 6,
+    "IdMeteran": "MT-006",
+    "BulanTagihan": "2024-02",
+    "TotalMeteranSebelumnya": 500,
+    "PenggunaanBulanIni": 25,
+    "TotalTagihan": 50000,
+    "StatusPembayaran": "Belum Lunas",
+    "TanggalBayar": null
+  },
+  {
+    "IdTagihan": 7,
+    "IdMeteran": "MT-007",
+    "BulanTagihan": "2024-03",
+    "TotalMeteranSebelumnya": 480,
+    "PenggunaanBulanIni": 60,
+    "TotalTagihan": 120000,
+    "StatusPembayaran": "Lunas",
+    "TanggalBayar": "2024-03-15"
+  },
+  {
+    "IdTagihan": 8,
+    "IdMeteran": "MT-008",
+    "BulanTagihan": "2024-03",
+    "TotalMeteranSebelumnya": 420,
+    "PenggunaanBulanIni": 20,
+    "TotalTagihan": 40000,
+    "StatusPembayaran": "Belum Lunas",
+    "TanggalBayar": null
+  },
+  {
+    "IdTagihan": 9,
+    "IdMeteran": "MT-009",
+    "BulanTagihan": "2024-04",
+    "TotalMeteranSebelumnya": 520,
+    "PenggunaanBulanIni": 40,
+    "TotalTagihan": 80000,
+    "StatusPembayaran": "Lunas",
+    "TanggalBayar": "2024-04-20"
+  },
+  {
+    "IdTagihan": 10,
+    "IdMeteran": "MT-010",
+    "BulanTagihan": "2024-04",
+    "TotalMeteranSebelumnya": 600,
+    "PenggunaanBulanIni": 35,
+    "TotalTagihan": 70000,
+    "StatusPembayaran": "Belum Lunas",
+    "TanggalBayar": null
+  }
+]

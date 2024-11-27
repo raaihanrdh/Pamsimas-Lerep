@@ -1,0 +1,62 @@
+[
+  {
+    "IdMeteran": "MT-001",
+    "NamaKepalaRumah": "Ahmad Fauzi",
+    "Alamat": "Jl. Merdeka No.1, Jakarta",
+    "Status": "Aktif"
+  },
+  {
+    "IdMeteran": "MT-002",
+    "NamaKepalaRumah": "Siti Aminah",
+    "Alamat": "Jl. Sudirman No.5, Bandung",
+    "Status": "Aktif"
+  },
+  {
+    "IdMeteran": "MT-003",
+    "NamaKepalaRumah": "Budi Santoso",
+    "Alamat": "Jl. Diponegoro No.9, Surabaya",
+    "Status": "Aktif"
+  },
+  {
+    "IdMeteran": "MT-004",
+    "NamaKepalaRumah": "Rahmat Hidayat",
+    "Alamat": "Jl. Gatot Subroto No.3, Medan",
+    "Status": "Aktif"
+  },
+  {
+    "IdMeteran": "MT-005",
+    "NamaKepalaRumah": "Ani Setiawati",
+    "Alamat": "Jl. Asia Afrika No.7, Jakarta",
+    "Status": "Aktif"
+  },
+  {
+    "IdMeteran": "MT-006",
+    "NamaKepalaRumah": "Ridwan Kamil",
+    "Alamat": "Jl. Braga No.8, Bandung",
+    "Status": "Aktif"
+  },
+  {
+    "IdMeteran": "MT-007",
+    "NamaKepalaRumah": "Desi Anggraeni",
+    "Alamat": "Jl. Basuki Rahmat No.11, Surabaya",
+    "Status": "Aktif"
+  },
+  {
+    "IdMeteran": "MT-008",
+    "NamaKepalaRumah": "Hadi Wijaya",
+    "Alamat": "Jl. Juanda No.15, Bogor",
+    "Status": "Tidak Aktif"
+  },
+  {
+    "IdMeteran": "MT-009",
+    "NamaKepalaRumah": "Nina Rosalina",
+    "Alamat": "Jl. Jendral Sudirman No.3, Jakarta",
+    "Status": "Aktif"
+  },
+  {
+    "IdMeteran": "MT-010",
+    "NamaKepalaRumah": "Samsul Arifin",
+    "Alamat": "Jl. Ahmad Yani No.20, Semarang",
+    "Status": "Aktif"
+  }
+]
