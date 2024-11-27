@@ -21,9 +21,10 @@ const LoginPage = () => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      if (response.ok) {
+      console.log(result.message)
+      if (response.status == 200) {
         //TAMBAHIN
-        Cookie.set("user", JSON.stringify(result), {
+        Cookie.set("user", JSON.stringify(result.message), {
           expires: 1,
         });
         //------

@@ -10,6 +10,11 @@ export function getAuth() {
   return user ? JSON.parse(user) : null;
 }
 
+export function getPermission(parent) {
+  const user = Cookies.get(`user.permissions`);
+  return user ? JSON.parse(user) : null;
+}
+
 export function clearAuth() {
   Cookies.remove("user");
 }

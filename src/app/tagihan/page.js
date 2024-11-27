@@ -7,10 +7,12 @@ import Navbar from "../components/Nav/navbar";
 import QRScanner from "../components/modal/qrScanModal";
 import { Html5Qrcode } from "html5-qrcode";
 import { FiCode, FiSquare, FiXSquare } from "react-icons/fi";
+import GenerateTagihanModal from "../components/modal/generatetagihanmodal";
 
 const TagihanBulanan = () => {
   const [dataTagihan, setDataTagihan] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showGenerateExcelModal, setShowGenerateExcelModal] = useState(false)
   const [showGenerateFormModal, setShowGenerateFormModal] = useState(false);
   const [showAllDataModal, setShowAllDataModal] = useState(false);
   const [editingTagihan, setEditingTagihan] = useState(null);
@@ -34,6 +36,7 @@ const TagihanBulanan = () => {
   const API_V = process.env.NEXT_PUBLIC_API_V;
 
   const [dataRT, setDataRT] = useState([]);
+  const [selectedDataRT, setSelectedDataRT] = useState("");
   const [countTagihan, setCountTagihan] = useState(0);
 
   useEffect(() => {
@@ -167,6 +170,7 @@ const TagihanBulanan = () => {
         const response = await fetch(`${ROOT_API}/${API_V}/tagihan/countnow`);
         const data = await response.json();
         setCountTagihan(data.data);
+        console.log(`TAGIHAN NOW: ${data.data}`)
       } catch (err) {
       } finally {
         setLoading(false);
@@ -198,6 +202,9 @@ const TagihanBulanan = () => {
   }, [idMeteran]);
 
   const fetchTagihanByRT = async (rw) => {
+    console.log(rw)
+    setSelectedDataRT(rw)
+    
     setIdMeteran("");
     try {
       const response = await axios.get(
@@ -268,7 +275,7 @@ const TagihanBulanan = () => {
 
     setFilteredData(currentItems);
     setTotalPages(totalPages);
-  }, [statusFilter, searchQuery, currentPage, itemsPerPage, dataTagihan]);
+  }, [statusFilter, searchQuery, currentPage, itemsPerPage]);
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -299,10 +306,15 @@ const TagihanBulanan = () => {
   // Previous handlers...
   const handleGenerateTagihan = async () => {
     try {
+      console.log('Tagihan sedang di generate...')
       // Generate tagihan
-      await axios.post(`${ROOT_API}/${API_V}/tagihan/generate`);
-      alert("Tagihan berhasil digenerate!");
-      fetchTagihan();
+      const response = await axios.post(`${ROOT_API}/${API_V}/tagihan/generate`);
+      if(response.status == 200) {
+        alert("Tagihan berhasil digenerate!");
+        fetchTagihan();
+      } else {
+        console.log(response.json().message)
+      }
     } catch (error) {
       console.error("Error generating tagihan:", error);
       alert("Terjadi kesalahan saat generate tagihan.");
@@ -319,7 +331,7 @@ const TagihanBulanan = () => {
       // Update tagihan
       if (updatedTagihan) {
         await axios.put(
-          `http://127.0.0.1:4000/api/v1/tagihan/${updatedTagihan.idTagihan}/detail`,
+          `${ROOT_API}/${API_V}/tagihan/${updatedTagihan.idTagihan}/detail`,
           updatedTagihan
         );
         alert("Tagihan berhasil diupdate!");
@@ -369,10 +381,10 @@ const TagihanBulanan = () => {
     setShowScanner(true);
   };
 
-  const openGenerateFormModal = () => {
-    setShowGenerateFormModal(true);
-    setShowAllDataModal(false);
-  };
+  // const openGenerateFormModal = () => {
+  //   setShowGenerateFormModal(true);
+  //   setShowAllDataModal(false);
+  // };
 
   const openAllDataModal = () => {
     setShowAllDataModal(true);
@@ -381,6 +393,7 @@ const TagihanBulanan = () => {
 
   const closeModal = () => {
     setShowGenerateFormModal(false);
+    setShowGenerateExcelModal(false)
     setShowScanner(false);
     setShowAllDataModal(false);
     setEditingTagihan(null);
@@ -394,7 +407,7 @@ const TagihanBulanan = () => {
           {countTagihan == 0 && (
             <button
               className=" bg-blue-500 px-3 py-2 rounded-lg text-white"
-              onClick={() => handleGenerateTagihan()}
+              onClick={handleGenerateTagihan}
             >
               + Generate
             </button>
@@ -429,6 +442,13 @@ const TagihanBulanan = () => {
           </button>
         </div>
         <button
+          onClick={() => setShowGenerateExcelModal(true)}
+          className="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600"
+        >
+          Generate Excel
+        </button>
+
+        <button
           onClick={requestCameraPermission}
           className="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600"
         >
@@ -436,8 +456,11 @@ const TagihanBulanan = () => {
         </button>
       </div>
 
+      { showGenerateExcelModal && (
+        <GenerateTagihanModal closeModal={closeModal} alamatRumah={selectedDataRT} />
+      ) }
+
       {/* Modals remain the same */}
-      {}
       {showGenerateFormModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded">
@@ -498,7 +521,7 @@ const TagihanBulanan = () => {
                     onClick={() => fetchTagihanByRT(rw._id)}
                     className={`px-3 py-2 rounded-lg shadow flex-grow md:flex-shrink-0 
             ${
-              rw === rw.id ? "bg-blue-500 text-white" : "bg-gray-200"
+              rw === rw._id ? "bg-blue-500 text-white" : "bg-gray-200"
             } hover:bg-blue-400 text-xs md:text-sm`}
                   >
                     {rtRwText}
@@ -731,6 +754,8 @@ const TagihanBulanan = () => {
 
       {activeTab === "tab2" && showAllDataModal && (
         <ModalAllData
+        showGenerateExcelModal={showGenerateExcelModal}
+        alamatRumah={selectedDataRT}
           closeModal={() => {
             closeModal();
             setActiveTab("tab1");

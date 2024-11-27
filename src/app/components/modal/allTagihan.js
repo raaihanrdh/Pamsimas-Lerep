@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import GenerateTagihanModal from "./generatetagihanmodal";
 
-const ModalAllData = ({ closeModal }) => {
+const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
   const [allData, setAllData] = useState([]);
   const [dataTagihan, setDataTagihan] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -16,7 +17,7 @@ const ModalAllData = ({ closeModal }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dataRT, setDataRT] = useState([]);
-
+  const [selectedDataRT, setSelectedDataRT] = useState("");
   const ROOT_API = process.env.NEXT_PUBLIC_API;
   const API_V = process.env.NEXT_PUBLIC_API_V;
 
@@ -52,6 +53,8 @@ const ModalAllData = ({ closeModal }) => {
   }, []);
 
   const fetchTagihanByRT = async (rw) => {
+    console.log(rw)
+    setSelectedDataRT(rw)
     console.log(`Sedang memuat tagihan all dari ${rw}`);
     setLoading(true);
     try {
@@ -301,6 +304,10 @@ const ModalAllData = ({ closeModal }) => {
           </tbody>
         </table>
       </div>
+
+      { showGenerateExcelModal && (
+        <GenerateTagihanModal closeModal={closeModal} alamatRumah={selectedDataRT} />
+      ) }
 
       {/* Mobile Card View */}
       <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
