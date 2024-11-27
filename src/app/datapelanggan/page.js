@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-//TAMBAHIN
+import { withAuth } from "../utils/routerAuth";
 import Cookie from "js-cookie";
 import { useRouter } from "next/navigation";
 
@@ -42,43 +41,12 @@ export default function DataPelanggan() {
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("");
   const [dataRT, setDataRT] = useState([]);
+  const [selectedDataRT, setSelectedDataRT] = useState("");
 
   //TAMBAHIN
   const router = useRouter();
-  //----
-
   useEffect(() => {
     //TAMBAHIN
-    const user = Cookie.get("user");
-    //----
-
-    // const fetchData = async () => {
-    //   setLoading(true);
-    //   setError(null);
-    //   try {
-    //     //TAMBAHIN
-    //     if (!user) {
-    //       //USER BELUM LOGIN
-    //       router.push("/");
-    //     } else {
-    //       const response = await fetch(API_URL);
-    //       if (!response.ok) {
-    //         throw new Error(`Failed to fetch data. Status: ${response.status}`);
-    //       }
-    //       const data = await response.json();
-    //       if (data && data.data) {
-    //         setDataPelanggan(data.data);
-    //       } else {
-    //         throw new Error("Invalid data format received");
-    //       }
-    //     }
-    //     //------
-    //   } catch (error) {
-    //     setError(`Error: ${error.message}`);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
 
     const fetchRT = async () => {
       setLoading(true);
@@ -94,12 +62,11 @@ export default function DataPelanggan() {
       }
     };
 
-    // fetchData();
     fetchRT();
-    // console.log(dataRT);
   }, [refreshData]);
 
   const fetchPelangganByRT = async (rw) => {
+    setSelectedDataRT(rw);
     setLoading(true);
     setError(null);
     try {
@@ -123,6 +90,18 @@ export default function DataPelanggan() {
   };
 
   const [rwFilter, setRwFilter] = useState(""); // State untuk RW
+  const [excelData, setExcelData] = useState(null);
+
+  const fetchGenerate = async () => {
+    const response = await fetch(
+      `${ROOT_API}/${API_V}/generatepelanggan?alamatRumah=${selectedDataRT}`
+    );
+    const blob = await response.blob();
+
+    const url = URL.createObjectURL(blob);
+
+    setExcelData(url);
+  };
 
   const handleRwFilter = async (rw) => {
     setRwFilter(rw); // Set filter RW
@@ -373,12 +352,18 @@ export default function DataPelanggan() {
               ))}
             </select>
             <button
-              onClick={() => openModal("create")}
+              onClick={() => fetchGenerate()}
+              // onClick={() => openModal("create")}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center"
             >
               <FiPlus className="mr-2" />
               Tambah Pelanggan
             </button>
+            {excelData && (
+              <a href={excelData} download={`pelanggan_${selectedDataRT}.xlsx`}>
+                Download Excel
+              </a>
+            )}
           </div>
 
           <div className="overflow-x-auto shadow-lg rounded-lg">

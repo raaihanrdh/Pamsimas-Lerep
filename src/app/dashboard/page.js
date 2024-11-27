@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Nav/navbar";
 import { Line, Bar } from "react-chartjs-2";
 import {
   FiDroplet,
