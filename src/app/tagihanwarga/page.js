@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "../common/api";
-import { FiFileText, FiHome, FiSearch } from "react-icons/fi";
+import { FiCreditCard, FiFileText, FiHome, FiSearch } from "react-icons/fi";
 
 const TagihanPelanggan = () => {
   const [dataRT, setDataRT] = useState([]);

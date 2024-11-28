@@ -260,7 +260,6 @@ export default function AmbangPage() {
             )}
           </>
         )}
-        ` `
         {modalOpen && editData && (
           <EditAmbangModal
             editData={editData}

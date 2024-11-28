@@ -4,7 +4,6 @@ import GenerateTagihanModal from "./generatetagihanmodal";
 
 const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
   const [allData, setAllData] = useState([]);
-  const [dataTagihan, setDataTagihan] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filters, setFilters] = useState({
     bulanTagihan: "",
@@ -18,8 +17,6 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
   const [loading, setLoading] = useState(false);
   const [dataRT, setDataRT] = useState([]);
   const [selectedDataRT, setSelectedDataRT] = useState("");
-  const ROOT_API = process.env.NEXT_PUBLIC_API;
-  const API_V = process.env.NEXT_PUBLIC_API_V;
 
   // Ambil semua data
   useEffect(() => {
@@ -36,25 +33,12 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
         setLoading(false);
       }
     };
-
-    // fetchData();
     fetchRT();
-    // const fetchAllData = async () => {
-    //   try {
-    //     const response = await axios.get(`${ROOT_API}/${API_V}/tagihan`);
-    //     const data = response.data.data;
-    //     setAllData(data);
-    //     setFilteredData(data);
-    //   } catch (error) {
-    //     console.error("Error fetching all data:", error);
-    //   }
-    // };
-    // fetchAllData();
   }, []);
 
   const fetchTagihanByRT = async (rw) => {
-    console.log(rw)
-    setSelectedDataRT(rw)
+    console.log(rw);
+    setSelectedDataRT(rw);
     console.log(`Sedang memuat tagihan all dari ${rw}`);
     setLoading(true);
     try {
@@ -64,7 +48,7 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
       const data = response.data.data;
 
       if (Array.isArray(data)) {
-        setAllData(data); // Perbarui allData
+        setAllData(data);
         setFilteredData(data); // Set filtered data awal
       } else {
         console.error("Data tagihan bukan array:", data);
@@ -305,9 +289,12 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
         </table>
       </div>
 
-      { showGenerateExcelModal && (
-        <GenerateTagihanModal closeModal={closeModal} alamatRumah={selectedDataRT} />
-      ) }
+      {showGenerateExcelModal && (
+        <GenerateTagihanModal
+          closeModal={closeModal}
+          alamatRumah={selectedDataRT}
+        />
+      )}
 
       {/* Mobile Card View */}
       <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">

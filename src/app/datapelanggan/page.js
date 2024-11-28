@@ -1,15 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { withAuth } from "../utils/routerAuth";
-import Cookie from "js-cookie";
 import { useRouter } from "next/navigation";
-
-//-------
-
 import { FiPlus, FiEdit, FiTrash2, FiDownload } from "react-icons/fi";
 import EditModal from "../components/modal/editmodal";
-import RiwayatModal from "../components/modal/riwayatmodal";
 import CreateModal from "../components/modal/createmodal";
 import QRModal from "../components/modal/QRModal";
 import Toast from "../components/Toast/successToast";

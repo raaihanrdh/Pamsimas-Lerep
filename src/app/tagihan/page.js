@@ -408,11 +408,6 @@ const TagihanBulanan = () => {
     setShowScanner(true);
   };
 
-  // const openGenerateFormModal = () => {
-  //   setShowGenerateFormModal(true);
-  //   setShowAllDataModal(false);
-  // };
-
   const openAllDataModal = () => {
     setShowAllDataModal(true);
     setShowGenerateFormModal(false);

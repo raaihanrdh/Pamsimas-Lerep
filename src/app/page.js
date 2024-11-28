@@ -48,7 +48,7 @@ const LandingPage = () => {
 
         {/* Footer Copyright */}
         <div className="mt-8 text-sm text-gray-500 flex items-center justify-center">
-          <span>© 2024 PAMSIMAS. All Rights Reserved.</span>
+          <span>© 2024 KKNT Desa Lerep. All Rights Reserved.</span>
         </div>
       </div>
     </div>
