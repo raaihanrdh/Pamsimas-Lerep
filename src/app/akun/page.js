@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_URL } from "../common/api";
 
 const AdminDashboard = () => {
   const [accounts, setAccounts] = useState([]);
@@ -23,7 +24,7 @@ const AdminDashboard = () => {
 
   const fetchAccounts = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:4000/api/v1/akun");
+      const response = await axios.get(`${API_URL}/akun`);
       setAccounts(response.data.data);
     } catch (error) {
       alert("Gagal memuat akun: " + error.message);
@@ -33,7 +34,7 @@ const AdminDashboard = () => {
   const handleAddAccount = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:4000/api/v1/akun/", currentAccount);
+      await axios.post(`${API_URL}/akun`, currentAccount);
       fetchAccounts();
       setIsAddModalOpen(false);
       resetCurrentAccount();
@@ -46,7 +47,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       await axios.put(
-        `http://127.0.0.1:4000/api/v1/akun/${currentAccount.username}`,
+        API_URL`/akun/${currentAccount.username}`,
         currentAccount
       );
       fetchAccounts();
@@ -61,7 +62,7 @@ const AdminDashboard = () => {
     if (!window.confirm("Apakah Anda yakin ingin menghapus akun ini?")) return;
 
     try {
-      await axios.delete(`http://127.0.0.1:4000/api/v1/akun/${username}`);
+      await axios.delete(`${API_URL}/akun/${username}`);
       fetchAccounts();
     } catch (error) {
       alert("Gagal menghapus akun: " + error.message);

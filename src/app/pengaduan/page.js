@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Nav/navbar";
 import Toast from "../components/Toast/successToast";
+import { API_URL } from "../common/api";
 
 const Page = () => {
   const [pengaduan, setPengaduan] = useState([]);
@@ -21,7 +22,7 @@ const Page = () => {
 
   useEffect(() => {
     const fetchPengaduan = async () => {
-      const response = await fetch("http://127.0.0.1:4000/api/v1/pengaduan");
+      const response = await fetch(`${API_URL}/pengaduan`);
       const data = await response.json();
       // Sortir pengaduan berdasarkan createdAt (pastikan field ini ada di response API)
       const sortedData = data.data.sort(
@@ -40,8 +41,6 @@ const Page = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const ROOT_API = process.env.NEXT_PUBLIC_API;
-  const API_V = process.env.NEXT_PUBLIC_API_V;
   // Handle page change
   const goToPage = (pageNumber) => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
@@ -82,7 +81,7 @@ const Page = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:4000/api/v1/pengaduan", {
+      const response = await fetch(`${API_URL}/pengaduan`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -135,16 +134,13 @@ const Page = () => {
     }
 
     try {
-      const response = await fetch(
-        `http://127.0.0.1:4000/api/v1/pengaduan/${idPengaduan}/detail`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ statusAduan: newStatus }),
-        }
-      );
+      const response = await fetch(API_URL`pengaduan/${idPengaduan}/detail`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ statusAduan: newStatus }),
+      });
 
       const result = await response.json();
       if (response.status === 200) {
@@ -172,273 +168,269 @@ const Page = () => {
   };
 
   return (
-    <Navbar>
-      <div className="flex-1 px-6 py-8">
-        <h2 className="text-3xl font-semibold mb-8">Halaman Pengaduan</h2>
+    <div className="flex-1 px-6 py-8">
+      <h2 className="text-3xl font-semibold mb-8">Halaman Pengaduan</h2>
 
-        {/* Form Pengaduan Baru */}
-        <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-          <h3 className="text-xl font-semibold mb-4">Ajukan Pengaduan Baru</h3>
-          <form onSubmit={handleAddComplaint}>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-gray-700">ID Meteran</label>
-                <input
-                  type="text"
-                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 ${
-                    errors.idMeteran
-                      ? "border-red-500 focus:ring-red-300"
-                      : "focus:ring-sky-300"
-                  }`}
-                  value={newComplaint.idMeteran}
-                  onChange={(e) =>
-                    setNewComplaint({
-                      ...newComplaint,
-                      idMeteran: e.target.value,
-                    })
-                  }
-                  required
-                />
-                {errors.idMeteran && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.idMeteran}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-gray-700">Pesan Pengaduan</label>
-                <textarea
-                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 ${
-                    errors.pesan
-                      ? "border-red-500 focus:ring-red-300"
-                      : "focus:ring-sky-300"
-                  }`}
-                  rows="4"
-                  value={newComplaint.pesan}
-                  onChange={(e) =>
-                    setNewComplaint({
-                      ...newComplaint,
-                      pesan: e.target.value,
-                    })
-                  }
-                  required
-                />
-                {errors.pesan && (
-                  <p className="text-red-500 text-sm mt-1">{errors.pesan}</p>
-                )}
-              </div>
-              <button
-                type="submit"
-                className={`w-full py-3 rounded-lg mt-4 text-white ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-sky-400 hover:bg-sky-500"
-                }`}
-                disabled={loading}
-              >
-                {loading ? "Mengirim..." : "Ajukan Pengaduan"}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Daftar Pengaduan */}
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h3 className="text-xl font-semibold mb-4">Daftar Pengaduan</h3>
-
-          {/* Filter Pengaduan */}
-          <div className="flex items-center justify-between mb-4 flex-col sm:flex-row">
-            <div className="flex space-x-4 mb-4 sm:mb-0 w-full sm:w-auto">
+      {/* Form Pengaduan Baru */}
+      <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
+        <h3 className="text-xl font-semibold mb-4">Ajukan Pengaduan Baru</h3>
+        <form onSubmit={handleAddComplaint}>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-700">ID Meteran</label>
               <input
                 type="text"
-                placeholder="Cari Pengaduan"
-                className="p-3 border border-gray-300 rounded-lg w-full"
-                onChange={handleSearch}
+                className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 ${
+                  errors.idMeteran
+                    ? "border-red-500 focus:ring-red-300"
+                    : "focus:ring-sky-300"
+                }`}
+                value={newComplaint.idMeteran}
+                onChange={(e) =>
+                  setNewComplaint({
+                    ...newComplaint,
+                    idMeteran: e.target.value,
+                  })
+                }
+                required
               />
-              <select
-                className="p-3 border border-gray-300 rounded-lg w-full sm:w-auto"
-                onChange={handleStatusFilter}
-              >
-                <option value="">Filter Status</option>
-                <option value="Selesai">Selesai</option>
-                <option value="Diproses">Diproses</option>
-                <option value="Belum diproses">Belum diproses</option>
-              </select>
-              <select
-                value={itemsPerPage}
-                onChange={handleItemsPerPageChange}
-                className="py-2 px-4 border border-gray-300 rounded text-sm"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
+              {errors.idMeteran && (
+                <p className="text-red-500 text-sm mt-1">{errors.idMeteran}</p>
+              )}
             </div>
-          </div>
 
-          {/* Daftar Pengaduan dengan Pagination */}
-          <div className="hidden md:block overflow-x-auto shadow-2xl rounded-2xl">
-            <table className="min-w-full table-auto border-separate border-spacing-0 rounded-lg shadow-xl">
-              <thead className="bg-sky-400 text-white">
-                <tr>
-                  <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
-                    ID Pengaduan
-                  </th>
-                  <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
-                    ID Meteran
-                  </th>
-                  <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
-                    Pesan
-                  </th>
-                  <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.map((item, index) => (
-                  <tr
-                    key={item.idPengaduan}
-                    className={`transition duration-300 ease-in-out hover:bg-sky-100 ${
-                      index % 2 === 0 ? "bg-sky-50" : "bg-white"
-                    }`}
-                  >
-                    <td className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
-                      {item.idPengaduan}
-                    </td>
-                    <td className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
-                      {item.idMeteran}
-                    </td>
-                    <td className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
-                      {item.pesan}
-                    </td>
-                    <td className="px-6 py-4 text-center border-b border-gray-300">
-                      <span
-                        className={`px-3 py-1 rounded-full whitespace-nowrap text-white ${
-                          item.statusAduan === "Selesai"
-                            ? "bg-green-500"
-                            : item.statusAduan === "Diproses"
-                            ? "bg-yellow-500"
-                            : "bg-red-500"
-                        }`}
-                      >
-                        {item.statusAduan}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center border-b border-gray-300">
-                      <div className="relative">
-                        <select
-                          className="bg-white border border-gray-300 rounded-lg shadow-sm py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200 ease-in-out"
-                          onChange={(e) =>
-                            handleStatusChange(item.idPengaduan, e.target.value)
-                          }
-                          defaultValue=""
-                        >
-                          <option value="" disabled>
-                            Ubah Status
-                          </option>
-                          <option value="Diproses">Diproses</option>
-                          <option value="Selesai">Selesai</option>
-                        </select>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div>
+              <label className="block text-gray-700">Pesan Pengaduan</label>
+              <textarea
+                className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 ${
+                  errors.pesan
+                    ? "border-red-500 focus:ring-red-300"
+                    : "focus:ring-sky-300"
+                }`}
+                rows="4"
+                value={newComplaint.pesan}
+                onChange={(e) =>
+                  setNewComplaint({
+                    ...newComplaint,
+                    pesan: e.target.value,
+                  })
+                }
+                required
+              />
+              {errors.pesan && (
+                <p className="text-red-500 text-sm mt-1">{errors.pesan}</p>
+              )}
+            </div>
+            <button
+              type="submit"
+              className={`w-full py-3 rounded-lg mt-4 text-white ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-sky-400 hover:bg-sky-500"
+              }`}
+              disabled={loading}
+            >
+              {loading ? "Mengirim..." : "Ajukan Pengaduan"}
+            </button>
           </div>
+        </form>
+      </div>
 
-          <div className="block sm:hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentItems.map((item) => (
-                <div
+      {/* Daftar Pengaduan */}
+      <div className="bg-white shadow-lg rounded-lg p-6">
+        <h3 className="text-xl font-semibold mb-4">Daftar Pengaduan</h3>
+
+        {/* Filter Pengaduan */}
+        <div className="flex items-center justify-between mb-4 flex-col sm:flex-row">
+          <div className="flex space-x-4 mb-4 sm:mb-0 w-full sm:w-auto">
+            <input
+              type="text"
+              placeholder="Cari Pengaduan"
+              className="p-3 border border-gray-300 rounded-lg w-full"
+              onChange={handleSearch}
+            />
+            <select
+              className="p-3 border border-gray-300 rounded-lg w-full sm:w-auto"
+              onChange={handleStatusFilter}
+            >
+              <option value="">Filter Status</option>
+              <option value="Selesai">Selesai</option>
+              <option value="Diproses">Diproses</option>
+              <option value="Belum diproses">Belum diproses</option>
+            </select>
+            <select
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+              className="py-2 px-4 border border-gray-300 rounded text-sm"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Daftar Pengaduan dengan Pagination */}
+        <div className="hidden sm:block overflow-x-auto shadow-2xl rounded-2xl">
+          <table className="min-w-full table-auto border-separate border-spacing-0 rounded-lg shadow-xl">
+            <thead className="bg-sky-400 text-white">
+              <tr>
+                <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
+                  ID Pengaduan
+                </th>
+                <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
+                  ID Meteran
+                </th>
+                <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
+                  Pesan
+                </th>
+                <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
+                  Aksi
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.map((item, index) => (
+                <tr
                   key={item.idPengaduan}
-                  className="bg-white shadow-lg rounded-lg p-6"
+                  className={`transition duration-300 ease-in-out hover:bg-sky-100 ${
+                    index % 2 === 0 ? "bg-sky-50" : "bg-white"
+                  }`}
                 >
-                  <h4 className="font-semibold">
-                    ID Pengaduan: {item.idPengaduan}
-                  </h4>
-                  <p className="text-sm">ID Meteran: {item.idMeteran}</p>
-                  <p className="text-sm mb-4">Pesan: {item.pesan}</p>
-                  <div className="flex justify-center">
+                  <td className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
+                    {item.idPengaduan}
+                  </td>
+                  <td className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
+                    {item.idMeteran}
+                  </td>
+                  <td className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
+                    {item.pesan}
+                  </td>
+                  <td className="px-6 py-4 text-center border-b border-gray-300">
                     <span
-                      className={`px-3 py-1 rounded-full inline-block text-white ${
+                      className={`px-3 py-1 rounded-full whitespace-nowrap text-white ${
                         item.statusAduan === "Selesai"
                           ? "bg-green-500"
                           : item.statusAduan === "Diproses"
                           ? "bg-yellow-500"
-                          : "bg-red-500 "
+                          : "bg-red-500"
                       }`}
                     >
                       {item.statusAduan}
                     </span>
-                  </div>
-                  <div className="flex justify-center mt-5 space-x-2">
-                    <button
-                      onClick={() =>
-                        handleStatusChange(item.idPengaduan, "Diproses")
-                      }
-                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
-                    >
-                      Proses
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleStatusChange(item.idPengaduan, "Selesai")
-                      }
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg"
-                    >
-                      Selesai
-                    </button>
-                  </div>
-                </div>
+                  </td>
+                  <td className="px-6 py-4 text-center border-b border-gray-300">
+                    <div className="relative">
+                      <select
+                        className="bg-white border border-gray-300 rounded-lg shadow-sm py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200 ease-in-out"
+                        onChange={(e) =>
+                          handleStatusChange(item.idPengaduan, e.target.value)
+                        }
+                        defaultValue=""
+                      >
+                        <option value="" disabled>
+                          Ubah Status
+                        </option>
+                        <option value="Diproses">Diproses</option>
+                        <option value="Selesai">Selesai</option>
+                      </select>
+                    </div>
+                  </td>
+                </tr>
               ))}
-            </div>
-          </div>
+            </tbody>
+          </table>
+        </div>
 
-          {/* Pagination */}
-          <div className="mt-4 flex justify-between items-center">
-            <div className="flex justify-center items-center  gap-2 mx-auto">
-              <button
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
+        <div className="block sm:hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {currentItems.map((item) => (
+              <div
+                key={item.idPengaduan}
+                className="bg-white shadow-lg rounded-lg p-6"
               >
-                Prev
-              </button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-          <div className="mt-4 text-center text-gray-600">
-            Showing {indexOfFirstItem + 1} to{" "}
-            {Math.min(indexOfLastItem, currentItems.length)} of{" "}
-            {currentItems.length} entries
+                <h4 className="font-semibold">
+                  ID Pengaduan: {item.idPengaduan}
+                </h4>
+                <p className="text-sm">ID Meteran: {item.idMeteran}</p>
+                <p className="text-sm mb-4">Pesan: {item.pesan}</p>
+                <div className="flex justify-center">
+                  <span
+                    className={`px-3 py-1 rounded-full inline-block text-white ${
+                      item.statusAduan === "Selesai"
+                        ? "bg-green-500"
+                        : item.statusAduan === "Diproses"
+                        ? "bg-yellow-500"
+                        : "bg-red-500 "
+                    }`}
+                  >
+                    {item.statusAduan}
+                  </span>
+                </div>
+                <div className="flex justify-center mt-5 space-x-2">
+                  <button
+                    onClick={() =>
+                      handleStatusChange(item.idPengaduan, "Diproses")
+                    }
+                    className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
+                  >
+                    Proses
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleStatusChange(item.idPengaduan, "Selesai")
+                    }
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                  >
+                    Selesai
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        {showToast && (
-          <Toast
-            type={toastType}
-            message={responseMessage}
-            isOpen={showToast}
-            onClose={() => setShowToast(false)}
-          />
-        )}
+
+        {/* Pagination */}
+        <div className="mt-4 flex justify-between items-center">
+          <div className="flex justify-center items-center  gap-2 mx-auto">
+            <button
+              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+        <div className="mt-4 text-center text-gray-600">
+          Showing {indexOfFirstItem + 1} to{" "}
+          {Math.min(indexOfLastItem, currentItems.length)} of{" "}
+          {currentItems.length} entries
+        </div>
       </div>
-    </Navbar>
+      {showToast && (
+        <Toast
+          type={toastType}
+          message={responseMessage}
+          isOpen={showToast}
+          onClose={() => setShowToast(false)}
+        />
+      )}
+    </div>
   );
 };
 

@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Cookie from "js-cookie";
 import axios from "axios";
+import { API_URL } from "../common/api";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");

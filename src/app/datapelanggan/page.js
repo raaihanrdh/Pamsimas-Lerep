@@ -4,24 +4,24 @@ import { useState, useEffect } from "react";
 import { withAuth } from "../utils/routerAuth";
 import Cookie from "js-cookie";
 import { useRouter } from "next/navigation";
-import { getAuth } from "../utils/routerAuth";
 
 //-------
 
-import { FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiPlus, FiEdit, FiTrash2, FiDownload } from "react-icons/fi";
 import EditModal from "../components/modal/editmodal";
 import RiwayatModal from "../components/modal/riwayatmodal";
 import CreateModal from "../components/modal/createmodal";
 import QRModal from "../components/modal/QRModal";
 import Toast from "../components/Toast/successToast";
 import { inconsolata } from "../components/Fonts/fonts";
+import { API_URL } from "../common/api";
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 25, 50];
 const ROOT_API = process.env.NEXT_PUBLIC_API;
 const API_V = process.env.NEXT_PUBLIC_API_V;
 
 export default function DataPelanggan() {
-  const API_URL = `${ROOT_API}/${API_V}/pelanggan`;
+  // const API_URL = `${ROOT_API}/${API_V}/pelanggan`;
 
   const [dataPelanggan, setDataPelanggan] = useState([]);
   const [qrCode, setQrCode] = useState(null);
@@ -44,54 +44,8 @@ export default function DataPelanggan() {
   const [dataRT, setDataRT] = useState([]);
   const [selectedDataRT, setSelectedDataRT] = useState("");
 
-  // AUTH
+  //TAMBAHIN
   const router = useRouter();
-  const [user, setUser] = useState({
-    permissions: {
-            pelanggan: {
-                create: 0,
-                read: 0,
-                update: 0,
-                delete: 0
-            },
-            tagihan: {
-                create: 0,
-                read: 0,
-                update: 0,
-                delete: 0
-            },
-            pengaduan: {
-                create: 0,
-                read: 0,
-                update: 0,
-                delete: 0
-            },
-            ambang: {
-              create: 0,
-              read: 0,
-              update: 0,
-              delete: 0
-          }
-        },
-        _id: '',
-        idAkun: '',
-        nama: '',
-        password: '',
-        createdAt: '',
-        updatedAt: '',
-        __v: 0,
-        username: ''
-  });
-
-  useEffect(() => {
-    const authUser = getAuth();
-
-    setUser(authUser);
-    console.log(user.permissions.pelanggan)
-  }, []);
-
-  // if (!isClient || !user) return null;
-
   useEffect(() => {
     //TAMBAHIN
 
@@ -118,7 +72,7 @@ export default function DataPelanggan() {
     setError(null);
     try {
       //TAMBAHIN
-      const response = await fetch(`${API_URL}?alamatRumah=${rw}`);
+      const response = await fetch(`${API_URL}/pelanggan?alamatRumah=${rw}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch data. Status: ${response.status}`);
       }
@@ -140,17 +94,23 @@ export default function DataPelanggan() {
   const [excelData, setExcelData] = useState(null);
 
   const fetchGenerate = async () => {
-    if(selectedDataRT) {
+    try {
       const response = await fetch(
-        `${ROOT_API}/${API_V}/generatepelanggan?alamatRumah=${selectedDataRT}`
+        `${API_URL}/generatepelanggan?alamatRumah=${selectedDataRT}`
       );
       const blob = await response.blob();
-  
       const url = URL.createObjectURL(blob);
-  
-      setExcelData(url);
-    } else {
-      console.log('Data RT Kosong')
+
+      // Buat elemen anchor untuk mengunduh file
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `pelanggan_${selectedDataRT}.xlsx`;
+      document.body.appendChild(link); // Tambahkan ke DOM sementara
+      link.click(); // Trigger unduhan
+      document.body.removeChild(link); // Hapus elemen setelah unduhan
+      URL.revokeObjectURL(url); // Bebaskan URL blob
+    } catch (error) {
+      alert("Gagal mengunduh file: " + error.message);
     }
   };
 
@@ -191,7 +151,7 @@ export default function DataPelanggan() {
 
     try {
       const response = await fetch(
-        `${API_URL}/${updatedData.idMeteran}/detail`,
+        `${API_URL}/pelanggan/${updatedData.idMeteran}/detail`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -223,7 +183,7 @@ export default function DataPelanggan() {
   const openQRCodeModal = async (idMeteran) => {
     try {
       const qrCodeResponse = await fetch(
-        `${ROOT_API}/${API_V}/pelanggan/${idMeteran}/generate`
+        `${API_URL}/pelanggan/${idMeteran}/generate`
       );
       const data = await qrCodeResponse.json();
       if (qrCodeResponse.ok) {
@@ -243,7 +203,7 @@ export default function DataPelanggan() {
 
   const handleCreatePelanggan = async (newData) => {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${API_URL}/pelanggan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newData),
@@ -277,7 +237,7 @@ export default function DataPelanggan() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/${idMeteran}`, {
+      const response = await fetch(`${API_URL}/pelanggan/${idMeteran}`, {
         method: "DELETE",
       });
 
@@ -402,29 +362,20 @@ export default function DataPelanggan() {
                 </option>
               ))}
             </select>
-            { user.permissions.pelanggan.create === 1 && (
-              <button
-              onClick={() => fetchGenerate()}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center"
-            >
-              <FiEdit className="mr-2" />
-              Generate Excel
-            </button>
-            ) } 
-            { user.permissions.pelanggan.create === 1 && (
-              <button
+            <button
               onClick={() => openModal("create")}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center"
             >
               <FiPlus className="mr-2" />
               Tambah Pelanggan
             </button>
-            ) } 
-            {excelData && user.permissions.pelanggan.create === 1 && (
-              <a href={excelData} download={`pelanggan_${selectedDataRT}.xlsx`}>
-                Download Excel
-              </a>
-            )}
+            <button
+              onClick={fetchGenerate}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center"
+            >
+              <FiDownload className="mr-2" />
+              Unduh Excel
+            </button>
           </div>
 
           <div className="overflow-x-auto shadow-lg rounded-lg">
@@ -480,16 +431,12 @@ export default function DataPelanggan() {
                           </button>
                         </td>
                         <td className="px-6 py-4 flex gap-2">
-                        {user.permissions.pelanggan.update === 1 && (
                           <button
                             onClick={() => openModal("edit", item)}
                             className="bg-sky-500 text-white hover:bg-sky-600 py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
                           >
                             <FiEdit className="text-white" /> Edit
                           </button>
-                        )}
-
-                        { user.permissions.pelanggan.delete === 1 && (
                           <button
                             onClick={() =>
                               handleDeletePelanggan(item.idMeteran)
@@ -498,7 +445,6 @@ export default function DataPelanggan() {
                           >
                             <FiTrash2 className="text-white" /> Hapus
                           </button>
-                        ) }
                         </td>
                       </tr>
                     ))
