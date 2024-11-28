@@ -154,6 +154,7 @@ const TagihanBulanan = () => {
 
   useEffect(() => {
     const fetchTagihanByIdMeteran = async (idMeteran) => {
+      setDataTagihan([]);
       try {
         const response = await axios.get(
           `${API_URL}/tagihan?idMeteran=${idMeteran}`
@@ -229,9 +230,10 @@ const TagihanBulanan = () => {
   }, [idMeteran]);
 
   const fetchTagihanByRT = async (rw) => {
-    console.log(rw);
-    setSelectedDataRT(rw);
-
+    setDataTagihan([]);
+    console.log(rw)
+    setSelectedDataRT(rw)
+    
     setIdMeteran("");
     try {
       const response = await axios.get(
@@ -309,7 +311,7 @@ const TagihanBulanan = () => {
   };
 
   const fetchTagihan = async () => {
-    setDataTagihan();
+    setDataTagihan([]);
     setFilteredData();
     try {
       const response = await axios.get(`${API_URL}/tagihan`);
