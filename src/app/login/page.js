@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Cookie from "js-cookie";
+import axios from "axios";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -13,14 +14,25 @@ const LoginPage = () => {
     e.preventDefault();
     const data = { username, password };
     try {
-      const response = await fetch(`${ROOT_API}/${API_V}`, {
-        method: "POST",
+      const config = {
         headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    }
+
+      const response = await axios.post(
+        `${ROOT_API}/${API_V}`,
+        JSON.stringify(data),
+      config);
+      // const response = await fetch(`${ROOT_API}/${API_V}`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(data),
+      // });
+      const result = await response.data;
       console.log(result.message)
       if (response.status == 200) {
         //TAMBAHIN
@@ -35,6 +47,7 @@ const LoginPage = () => {
         setErrorMessage(result.message || "Login failed. Please try again.");
       }
     } catch (error) {
+      console.log(error)
       setErrorMessage("An error occurred. Please try again later.");
     }
   };
