@@ -59,7 +59,7 @@ const TagihanPelanggan = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-sky-400 via-sky-500 to-sky-600 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl bg-white shadow-2xl rounded-2xl overflow-hidden">
         <div className="bg-sky-400 justify-center text-white p-6 flex items-center space-x-4">
           <h1 className="text-2xl font-bold">Cek Tagihan Air</h1>
