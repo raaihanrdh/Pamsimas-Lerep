@@ -22,6 +22,8 @@ const LoginPage = () => {
         }
     }
 
+    console.log("TEST")
+
       const response = await axios.post(
         `${ROOT_API}/${API_V}`,
         JSON.stringify(data),
