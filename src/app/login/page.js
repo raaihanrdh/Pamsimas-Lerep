@@ -17,15 +17,18 @@ const LoginPage = () => {
     try {
       const config = {
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    }
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      };
+
+      console.log(data);
 
       const response = await axios.post(
         `${ROOT_API}/${API_V}`,
         JSON.stringify(data),
-      config);
+        config
+      );
       // const response = await fetch(`${ROOT_API}/${API_V}`, {
       //   method: "POST",
       //   headers: {
@@ -34,7 +37,7 @@ const LoginPage = () => {
       //   body: JSON.stringify(data),
       // });
       const result = await response.data;
-      console.log(result.message)
+      console.log(result.message);
       if (response.status == 200) {
         //TAMBAHIN
         Cookie.set("user", JSON.stringify(result.message), {
@@ -48,7 +51,7 @@ const LoginPage = () => {
         setErrorMessage(result.message || "Login failed. Please try again.");
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setErrorMessage("An error occurred. Please try again later.");
     }
   };
