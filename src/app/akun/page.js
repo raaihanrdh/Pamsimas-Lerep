@@ -47,7 +47,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       await axios.put(
-        API_URL`/akun/${currentAccount.username}`,
+        API_URL`/akun/${currentAccount.username}/detail`,
         currentAccount
       );
       fetchAccounts();
