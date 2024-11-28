@@ -3,7 +3,12 @@ import React, { useState, useEffect } from "react";
 import EditAmbangModal from "../components/modal/editAmbangModal";
 import Toast from "../components/Toast/successToast";
 import { inconsolata } from "../components/Fonts/fonts";
+<<<<<<< HEAD
 import { API_URL } from "../common/api";
+=======
+import { useRouter } from "next/navigation";
+import { getAuth } from "../utils/routerAuth";
+>>>>>>> 370805d02e49a5d6b7c172a41b337b04e84254c8
 
 export default function AmbangPage() {
   const [data, setData] = useState([]);
@@ -13,6 +18,52 @@ export default function AmbangPage() {
   const [selectedDusun, setSelectedDusun] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("");
+
+  // AUTH
+  const router = useRouter();
+  const [user, setUser] = useState({
+    permissions: {
+            pelanggan: {
+                create: 0,
+                read: 0,
+                update: 0,
+                delete: 0
+            },
+            tagihan: {
+                create: 0,
+                read: 0,
+                update: 0,
+                delete: 0
+            },
+            pengaduan: {
+                create: 0,
+                read: 0,
+                update: 0,
+                delete: 0
+            },
+            ambang: {
+              create: 0,
+              read: 0,
+              update: 0,
+              delete: 0
+          }
+        },
+        _id: '',
+        idAkun: '',
+        nama: '',
+        password: '',
+        createdAt: '',
+        updatedAt: '',
+        __v: 0,
+        username: ''
+  });
+
+  useEffect(() => {
+    const authUser = getAuth();
+
+    setUser(authUser);
+    console.log(user.permissions.pelanggan)
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -102,9 +153,11 @@ export default function AmbangPage() {
                       <th className="px-6 py-4 text-center border-b border-gray-300">
                         Meteran Pribadi
                       </th>
-                      <th className="px-6 py-4 text-center border-b border-gray-300">
+                      { user.permissions.ambang.update === 1&& (
+                        <th className="px-6 py-4 text-center border-b border-gray-300">
                         Aksi
                       </th>
+                      ) }
                     </tr>
                   </thead>
                   <tbody>
@@ -112,7 +165,7 @@ export default function AmbangPage() {
                       <React.Fragment key={index}>
                         <tr
                           className={`${
-                            index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                            index % 2 === 1? "bg-gray-100" : "bg-white"
                           } hover:bg-gray-200`}
                         >
                           <td className="px-6 py-4 text-center border-b border-gray-300">
@@ -124,18 +177,20 @@ export default function AmbangPage() {
                           <td className="px-6 py-4 text-center border-b border-gray-300">
                             {row.ambangMinimum.meteranPribadi}
                           </td>
-                          <td className="px-6 py-4 text-center border-b border-gray-300">
-                            <button
-                              onClick={() => handleEdit(row)}
-                              className="text-white bg-sky-400 px-3 py-2 rounded-lg font-semibold hover:underline"
-                            >
-                              Ubah
-                            </button>
-                          </td>
+                          { user.permissions.ambang.update === 1&& (
+                              <td className="px-6 py-4 text-center border-b border-gray-300">
+                              <button
+                                  onClick={() => handleEdit(row)}
+                                  className="text-white bg-sky-400 px-3 py-2 rounded-lg font-semibold hover:underline"
+                                >
+                                  Ubah
+                                </button>
+                              </td>
+                            ) }
                         </tr>
                         <tr
                           className={`${
-                            index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                            index % 2 === 1? "bg-gray-100" : "bg-white"
                           } hover:bg-gray-200`}
                         >
                           <td className="px-6 py-4 text-center border-b border-gray-300">
@@ -147,18 +202,20 @@ export default function AmbangPage() {
                           <td className="px-6 py-4 text-center border-b border-gray-300">
                             {row.nominalMinimum.meteranPribadi}
                           </td>
-                          <td className="px-6 py-4 text-center border-b border-gray-300">
-                            <button
-                              onClick={() => handleEdit(row)}
-                              className="text-white bg-sky-400 px-3 py-2 rounded-lg font-semibold hover:underline"
-                            >
-                              Ubah
-                            </button>
-                          </td>
+                          { user.permissions.ambang.update === 1&& (
+                              <td className="px-6 py-4 text-center border-b border-gray-300">
+                              <button
+                                  onClick={() => handleEdit(row)}
+                                  className="text-white bg-sky-400 px-3 py-2 rounded-lg font-semibold hover:underline"
+                                >
+                                  Ubah
+                                </button>
+                              </td>
+                            ) }
                         </tr>
                         <tr
                           className={`${
-                            index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                            index % 2 === 1? "bg-gray-100" : "bg-white"
                           } hover:bg-gray-200`}
                         >
                           <td className="px-6 py-4 text-center border-b border-gray-300">
@@ -170,18 +227,20 @@ export default function AmbangPage() {
                           <td className="px-6 py-4 text-center border-b border-gray-300">
                             {row.hargaPerKubik.meteranPribadi}
                           </td>
-                          <td className="px-6 py-4 text-center border-b border-gray-300">
-                            <button
-                              onClick={() => handleEdit(row)}
-                              className="text-white bg-sky-400 px-3 py-2 rounded-lg font-semibold hover:underline"
-                            >
-                              Ubah
-                            </button>
-                          </td>
+                          { user.permissions.ambang.update === 1&& (
+                              <td className="px-6 py-4 text-center border-b border-gray-300">
+                              <button
+                                  onClick={() => handleEdit(row)}
+                                  className="text-white bg-sky-400 px-3 py-2 rounded-lg font-semibold hover:underline"
+                                >
+                                  Ubah
+                                </button>
+                              </td>
+                            ) }
                         </tr>
                         <tr
                           className={`${
-                            index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                            index % 2 === 1? "bg-gray-100" : "bg-white"
                           } hover:bg-gray-200`}
                         >
                           <td className="px-6 py-4 text-center border-b border-gray-300">
@@ -193,14 +252,16 @@ export default function AmbangPage() {
                           <td className="px-6 py-4 text-center border-b border-gray-300">
                             {row.biayaAdmin.meteranPribadi}
                           </td>
-                          <td className="px-6 py-4 text-center border-b border-gray-300">
-                            <button
-                              onClick={() => handleEdit(row)}
-                              className="text-white bg-sky-400 px-3 py-2 rounded-lg font-semibold hover:underline"
-                            >
-                              Ubah
-                            </button>
-                          </td>
+                          { user.permissions.ambang.update === 1&& (
+                              <td className="px-6 py-4 text-center border-b border-gray-300">
+                              <button
+                                  onClick={() => handleEdit(row)}
+                                  className="text-white bg-sky-400 px-3 py-2 rounded-lg font-semibold hover:underline"
+                                >
+                                  Ubah
+                                </button>
+                              </td>
+                            ) }
                         </tr>
                       </React.Fragment>
                     ))}
