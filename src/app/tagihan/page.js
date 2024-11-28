@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import axios from "axios";
 import ModalAllData from "../components/modal/allTagihan";
 import Navbar from "../components/Nav/navbar";
 import QRScanner from "../components/modal/qrScanModal";
 import { Html5Qrcode } from "html5-qrcode";
 import { FiCode, FiSquare, FiXSquare } from "react-icons/fi";
+import { useRouter } from "next/navigation";
+import { getAuth } from "../utils/routerAuth";
 import GenerateTagihanModal from "../components/modal/generatetagihanmodal";
 
 const TagihanBulanan = () => {
@@ -38,6 +40,52 @@ const TagihanBulanan = () => {
   const [dataRT, setDataRT] = useState([]);
   const [selectedDataRT, setSelectedDataRT] = useState("");
   const [countTagihan, setCountTagihan] = useState(0);
+
+    // AUTH
+    const router = useRouter();
+    const [user, setUser] = useState({
+      permissions: {
+              pelanggan: {
+                  create: 0,
+                  read: 0,
+                  update: 0,
+                  delete: 0
+              },
+              tagihan: {
+                  create: 0,
+                  read: 0,
+                  update: 0,
+                  delete: 0
+              },
+              pengaduan: {
+                  create: 0,
+                  read: 0,
+                  update: 0,
+                  delete: 0
+              },
+              ambang: {
+                create: 0,
+                read: 0,
+                update: 0,
+                delete: 0
+            }
+          },
+          _id: '',
+          idAkun: '',
+          nama: '',
+          password: '',
+          createdAt: '',
+          updatedAt: '',
+          __v: 0,
+          username: ''
+    });
+  
+    useEffect(() => {
+      const authUser = getAuth();
+  
+      setUser(authUser);
+      console.log(user.permissions.pelanggan)
+    }, []);
 
   useEffect(() => {
     // Memulai pemindaian QR hanya jika showScanner berubah menjadi true
@@ -441,19 +489,23 @@ const TagihanBulanan = () => {
             All Data
           </button>
         </div>
-        <button
-          onClick={() => setShowGenerateExcelModal(true)}
-          className="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600"
-        >
-          Generate Excel
-        </button>
+        { user.permissions.tagihan.create === 1 && (
+          <button
+            onClick={() => setShowGenerateExcelModal(true)}
+            className="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600"
+          >
+            Generate Excel
+          </button>
+        ) }
 
-        <button
+        { user.permissions.tagihan.read === 1 && (
+          <button
           onClick={requestCameraPermission}
           className="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600"
         >
           Pindai Tagihan
         </button>
+        ) }
       </div>
 
       { showGenerateExcelModal && (

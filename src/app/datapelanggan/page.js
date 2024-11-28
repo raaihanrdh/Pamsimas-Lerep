@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { withAuth } from "../utils/routerAuth";
 import Cookie from "js-cookie";
 import { useRouter } from "next/navigation";
+import { getAuth } from "../utils/routerAuth";
 
 //-------
 
@@ -43,8 +44,54 @@ export default function DataPelanggan() {
   const [dataRT, setDataRT] = useState([]);
   const [selectedDataRT, setSelectedDataRT] = useState("");
 
-  //TAMBAHIN
+  // AUTH
   const router = useRouter();
+  const [user, setUser] = useState({
+    permissions: {
+            pelanggan: {
+                create: 0,
+                read: 0,
+                update: 0,
+                delete: 0
+            },
+            tagihan: {
+                create: 0,
+                read: 0,
+                update: 0,
+                delete: 0
+            },
+            pengaduan: {
+                create: 0,
+                read: 0,
+                update: 0,
+                delete: 0
+            },
+            ambang: {
+              create: 0,
+              read: 0,
+              update: 0,
+              delete: 0
+          }
+        },
+        _id: '',
+        idAkun: '',
+        nama: '',
+        password: '',
+        createdAt: '',
+        updatedAt: '',
+        __v: 0,
+        username: ''
+  });
+
+  useEffect(() => {
+    const authUser = getAuth();
+
+    setUser(authUser);
+    console.log(user.permissions.pelanggan)
+  }, []);
+
+  // if (!isClient || !user) return null;
+
   useEffect(() => {
     //TAMBAHIN
 
@@ -93,14 +140,18 @@ export default function DataPelanggan() {
   const [excelData, setExcelData] = useState(null);
 
   const fetchGenerate = async () => {
-    const response = await fetch(
-      `${ROOT_API}/${API_V}/generatepelanggan?alamatRumah=${selectedDataRT}`
-    );
-    const blob = await response.blob();
-
-    const url = URL.createObjectURL(blob);
-
-    setExcelData(url);
+    if(selectedDataRT) {
+      const response = await fetch(
+        `${ROOT_API}/${API_V}/generatepelanggan?alamatRumah=${selectedDataRT}`
+      );
+      const blob = await response.blob();
+  
+      const url = URL.createObjectURL(blob);
+  
+      setExcelData(url);
+    } else {
+      console.log('Data RT Kosong')
+    }
   };
 
   const handleRwFilter = async (rw) => {
@@ -351,15 +402,25 @@ export default function DataPelanggan() {
                 </option>
               ))}
             </select>
-            <button
+            { user.permissions.pelanggan.create === 1 && (
+              <button
               onClick={() => fetchGenerate()}
-              // onClick={() => openModal("create")}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center"
+            >
+              <FiEdit className="mr-2" />
+              Generate Excel
+            </button>
+            ) } 
+            { user.permissions.pelanggan.create === 1 && (
+              <button
+              onClick={() => openModal("create")}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center"
             >
               <FiPlus className="mr-2" />
               Tambah Pelanggan
             </button>
-            {excelData && (
+            ) } 
+            {excelData && user.permissions.pelanggan.create === 1 && (
               <a href={excelData} download={`pelanggan_${selectedDataRT}.xlsx`}>
                 Download Excel
               </a>
@@ -419,12 +480,16 @@ export default function DataPelanggan() {
                           </button>
                         </td>
                         <td className="px-6 py-4 flex gap-2">
+                        {user.permissions.pelanggan.update === 1 && (
                           <button
                             onClick={() => openModal("edit", item)}
                             className="bg-sky-500 text-white hover:bg-sky-600 py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
                           >
                             <FiEdit className="text-white" /> Edit
                           </button>
+                        )}
+
+                        { user.permissions.pelanggan.delete === 1 && (
                           <button
                             onClick={() =>
                               handleDeletePelanggan(item.idMeteran)
@@ -433,6 +498,7 @@ export default function DataPelanggan() {
                           >
                             <FiTrash2 className="text-white" /> Hapus
                           </button>
+                        ) }
                         </td>
                       </tr>
                     ))
