@@ -14,7 +14,7 @@ const LandingPage = () => {
         <div className="space-y-4">
           {/* Tombol Tagihan */}
           <a
-            href="/tagihan"
+            href="/tagihanpelanggan"
             className="block py-3 px-6 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-300 ease-in-out"
           >
             Lihat Tagihan
@@ -22,7 +22,7 @@ const LandingPage = () => {
 
           {/* Tombol Pembuatan Aduan */}
           <a
-            href="/aduan"
+            href="/aduanpelanggan"
             className="block py-3 px-6 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition duration-300 ease-in-out"
           >
             Buat Aduan
@@ -30,7 +30,7 @@ const LandingPage = () => {
 
           {/* Tombol Monitoring Aduan */}
           <a
-            href="/monitoring-aduan"
+            href="/searchpengaduan"
             className="block py-3 px-6 bg-orange-500 text-white rounded-lg shadow hover:bg-orange-600 transition duration-300 ease-in-out"
           >
             Monitoring Aduan

@@ -20,6 +20,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { API_URL } from "../common/api";
 
 // Mendaftarkan komponen Chart.js
 ChartJS.register(
@@ -46,7 +47,7 @@ const Page = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:4000/api/v1/dashboard");
+        const response = await fetch(`${API_URL}/dashboard`);
         const data = await response.json();
         if (response.ok) {
           setDashboardData(data);

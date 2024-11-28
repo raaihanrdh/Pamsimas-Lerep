@@ -7,20 +7,21 @@ import { useRouter } from "next/navigation";
 
 //-------
 
-import { FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiPlus, FiEdit, FiTrash2, FiDownload } from "react-icons/fi";
 import EditModal from "../components/modal/editmodal";
 import RiwayatModal from "../components/modal/riwayatmodal";
 import CreateModal from "../components/modal/createmodal";
 import QRModal from "../components/modal/QRModal";
 import Toast from "../components/Toast/successToast";
 import { inconsolata } from "../components/Fonts/fonts";
+import { API_URL } from "../common/api";
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 25, 50];
 const ROOT_API = process.env.NEXT_PUBLIC_API;
 const API_V = process.env.NEXT_PUBLIC_API_V;
 
 export default function DataPelanggan() {
-  const API_URL = `${ROOT_API}/${API_V}/pelanggan`;
+  // const API_URL = `${ROOT_API}/${API_V}/pelanggan`;
 
   const [dataPelanggan, setDataPelanggan] = useState([]);
   const [qrCode, setQrCode] = useState(null);
@@ -71,7 +72,7 @@ export default function DataPelanggan() {
     setError(null);
     try {
       //TAMBAHIN
-      const response = await fetch(`${API_URL}?alamatRumah=${rw}`);
+      const response = await fetch(`${API_URL}/pelanggan?alamatRumah=${rw}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch data. Status: ${response.status}`);
       }
@@ -93,14 +94,24 @@ export default function DataPelanggan() {
   const [excelData, setExcelData] = useState(null);
 
   const fetchGenerate = async () => {
-    const response = await fetch(
-      `${ROOT_API}/${API_V}/generatepelanggan?alamatRumah=${selectedDataRT}`
-    );
-    const blob = await response.blob();
+    try {
+      const response = await fetch(
+        `${API_URL}/generatepelanggan?alamatRumah=${selectedDataRT}`
+      );
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
 
-    const url = URL.createObjectURL(blob);
-
-    setExcelData(url);
+      // Buat elemen anchor untuk mengunduh file
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `pelanggan_${selectedDataRT}.xlsx`;
+      document.body.appendChild(link); // Tambahkan ke DOM sementara
+      link.click(); // Trigger unduhan
+      document.body.removeChild(link); // Hapus elemen setelah unduhan
+      URL.revokeObjectURL(url); // Bebaskan URL blob
+    } catch (error) {
+      alert("Gagal mengunduh file: " + error.message);
+    }
   };
 
   const handleRwFilter = async (rw) => {
@@ -140,7 +151,7 @@ export default function DataPelanggan() {
 
     try {
       const response = await fetch(
-        `${API_URL}/${updatedData.idMeteran}/detail`,
+        `${API_URL}/pelanggan/${updatedData.idMeteran}/detail`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -172,7 +183,7 @@ export default function DataPelanggan() {
   const openQRCodeModal = async (idMeteran) => {
     try {
       const qrCodeResponse = await fetch(
-        `${ROOT_API}/${API_V}/pelanggan/${idMeteran}/generate`
+        `${API_URL}/pelanggan/${idMeteran}/generate`
       );
       const data = await qrCodeResponse.json();
       if (qrCodeResponse.ok) {
@@ -192,7 +203,7 @@ export default function DataPelanggan() {
 
   const handleCreatePelanggan = async (newData) => {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${API_URL}/pelanggan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newData),
@@ -226,7 +237,7 @@ export default function DataPelanggan() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/${idMeteran}`, {
+      const response = await fetch(`${API_URL}/pelanggan/${idMeteran}`, {
         method: "DELETE",
       });
 
@@ -352,18 +363,19 @@ export default function DataPelanggan() {
               ))}
             </select>
             <button
-              onClick={() => fetchGenerate()}
-              // onClick={() => openModal("create")}
+              onClick={() => openModal("create")}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center"
             >
               <FiPlus className="mr-2" />
               Tambah Pelanggan
             </button>
-            {excelData && (
-              <a href={excelData} download={`pelanggan_${selectedDataRT}.xlsx`}>
-                Download Excel
-              </a>
-            )}
+            <button
+              onClick={fetchGenerate}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center"
+            >
+              <FiDownload className="mr-2" />
+              Unduh Excel
+            </button>
           </div>
 
           <div className="overflow-x-auto shadow-lg rounded-lg">

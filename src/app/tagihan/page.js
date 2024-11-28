@@ -3,16 +3,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ModalAllData from "../components/modal/allTagihan";
-import Navbar from "../components/Nav/navbar";
-import QRScanner from "../components/modal/qrScanModal";
 import { Html5Qrcode } from "html5-qrcode";
-import { FiCode, FiSquare, FiXSquare } from "react-icons/fi";
 import GenerateTagihanModal from "../components/modal/generatetagihanmodal";
+import { API_URL } from "../common/api";
 
 const TagihanBulanan = () => {
   const [dataTagihan, setDataTagihan] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showGenerateExcelModal, setShowGenerateExcelModal] = useState(false)
+  const [showGenerateExcelModal, setShowGenerateExcelModal] = useState(false);
   const [showGenerateFormModal, setShowGenerateFormModal] = useState(false);
   const [showAllDataModal, setShowAllDataModal] = useState(false);
   const [editingTagihan, setEditingTagihan] = useState(null);
@@ -40,12 +38,10 @@ const TagihanBulanan = () => {
   const [countTagihan, setCountTagihan] = useState(0);
 
   useEffect(() => {
-    // Memulai pemindaian QR hanya jika showScanner berubah menjadi true
     if (showScanner) {
       startScanner();
     }
-  }, [showScanner]); // Menambahkan showScanner sebagai dependensi
-
+  }, [showScanner]);
   const startScanner = () => {
     const html5Qrcode = new Html5Qrcode("reader");
     setCameraScanner(html5Qrcode);
@@ -60,17 +56,10 @@ const TagihanBulanan = () => {
           setActiveTab("tab1");
         })
         .catch((err) => {
-          // ================== TAMPILKAN ALERT ERROR
           console.log(err);
           setActiveTab("tab1");
-        }); // Hentikan scanner setelah berhasil mendeteksi QR code
+        });
     };
-
-    // const qrCodeErrorCallback = (errorMessage) => {
-    //   setCameraError(errorMessage); // Set error jika pemindaian gagal
-    //   console.error(errorMessage);
-    // };
-
     const getResponsiveQrBox = () => {
       const windowWidth = window.innerWidth;
       const minBoxSize = 200;
@@ -81,29 +70,24 @@ const TagihanBulanan = () => {
 
     const config = {
       fps: 10,
-      qrbox: getResponsiveQrBox(), // Responsif terhadap ukuran layar
+      qrbox: getResponsiveQrBox(),
     };
 
-    // Mulai pemindaian dengan konfigurasi dan callback
     html5Qrcode.start(
       { facingMode: "environment" },
       config,
       qrCodeSuccessCallback
-      // qrCodeErrorCallback
     );
   };
 
   const requestCameraPermission = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-
-      // Tutup stream setelah dicek
       stream.getTracks().forEach((track) => track.stop());
 
       openScanModal();
-      setCameraError(null); // Reset error kamera
+      setCameraError(null);
     } catch (error) {
-      // ================== TAMPILKAN ALERT ERROR
       setCameraError("Akses kamera diperlukan untuk memindai kode QR");
       console.error("Kesalahan akses kamera:", error);
     }
@@ -111,10 +95,10 @@ const TagihanBulanan = () => {
 
   const stopScanner = () => {
     if (cameraScanner) {
-      setShowScanner(false); // Menyembunyikan scanner saat berhenti
+      setShowScanner(false);
       const html5QrCode = new Html5Qrcode("reader");
       cameraScanner.stop();
-      setCameraError(null); // Reset error kamera
+      setCameraError(null);
     }
   };
 
@@ -122,10 +106,9 @@ const TagihanBulanan = () => {
     const fetchTagihanByIdMeteran = async (idMeteran) => {
       try {
         const response = await axios.get(
-          `${ROOT_API}/${API_V}/tagihan?idMeteran=${idMeteran}`
+          `${API_URL}/tagihan?idMeteran=${idMeteran}`
         );
         const data = response.data.data;
-
         if (Array.isArray(data)) {
           setDataTagihan(data);
           setFilteredData(data);
@@ -141,15 +124,11 @@ const TagihanBulanan = () => {
       }
 
       let result = [...dataTagihan];
-
-      // Apply status filter
       if (statusFilter !== "all") {
         result = result.filter(
           (item) => item.statusPembayaran === statusFilter
         );
       }
-
-      // Apply search
       if (searchQuery) {
         result = result.filter((item) =>
           Object.values(item).some(
@@ -167,22 +146,20 @@ const TagihanBulanan = () => {
     const countNow = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${ROOT_API}/${API_V}/tagihan/countnow`);
+        const response = await fetch(`${API_URL}/tagihan/countnow`);
         const data = await response.json();
         setCountTagihan(data.data);
-        console.log(`TAGIHAN NOW: ${data.data}`)
+        console.log(`TAGIHAN NOW: ${data.data}`);
       } catch (err) {
       } finally {
         setLoading(false);
       }
     };
-
     countNow();
-
     const fetchRT = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${ROOT_API}/${API_V}/pelangganRTRW`);
+        const response = await fetch(`${API_URL}/pelangganRTRW`);
         const data = await response.json();
         setDataRT(data.data);
         console.log(data);
@@ -202,13 +179,13 @@ const TagihanBulanan = () => {
   }, [idMeteran]);
 
   const fetchTagihanByRT = async (rw) => {
-    console.log(rw)
-    setSelectedDataRT(rw)
-    
+    console.log(rw);
+    setSelectedDataRT(rw);
+
     setIdMeteran("");
     try {
       const response = await axios.get(
-        `${ROOT_API}/${API_V}/tagihan/now?alamatRumah=${rw}`
+        `${API_URL}/tagihan/now?alamatRumah=${rw}`
       );
       const data = response.data.data;
 
@@ -285,7 +262,7 @@ const TagihanBulanan = () => {
     setDataTagihan();
     setFilteredData();
     try {
-      const response = await axios.get(`${ROOT_API}/${API_V}/tagihan`);
+      const response = await axios.get(`${API_URL}/tagihan`);
       const data = response.data.data;
 
       if (Array.isArray(data)) {
@@ -306,14 +283,14 @@ const TagihanBulanan = () => {
   // Previous handlers...
   const handleGenerateTagihan = async () => {
     try {
-      console.log('Tagihan sedang di generate...')
+      console.log("Tagihan sedang di generate...");
       // Generate tagihan
-      const response = await axios.post(`${ROOT_API}/${API_V}/tagihan/generate`);
-      if(response.status == 200) {
+      const response = await axios.post(`${API_URL}/tagihan/generate`);
+      if (response.status == 200) {
         alert("Tagihan berhasil digenerate!");
         fetchTagihan();
       } else {
-        console.log(response.json().message)
+        console.log(response.json().message);
       }
     } catch (error) {
       console.error("Error generating tagihan:", error);
@@ -331,7 +308,7 @@ const TagihanBulanan = () => {
       // Update tagihan
       if (updatedTagihan) {
         await axios.put(
-          `${ROOT_API}/${API_V}/tagihan/${updatedTagihan.idTagihan}/detail`,
+          `${API_URL}/tagihan/${updatedTagihan.idTagihan}/detail`,
           updatedTagihan
         );
         alert("Tagihan berhasil diupdate!");
@@ -393,7 +370,7 @@ const TagihanBulanan = () => {
 
   const closeModal = () => {
     setShowGenerateFormModal(false);
-    setShowGenerateExcelModal(false)
+    setShowGenerateExcelModal(false);
     setShowScanner(false);
     setShowAllDataModal(false);
     setEditingTagihan(null);
@@ -456,9 +433,12 @@ const TagihanBulanan = () => {
         </button>
       </div>
 
-      { showGenerateExcelModal && (
-        <GenerateTagihanModal closeModal={closeModal} alamatRumah={selectedDataRT} />
-      ) }
+      {showGenerateExcelModal && (
+        <GenerateTagihanModal
+          closeModal={closeModal}
+          alamatRumah={selectedDataRT}
+        />
+      )}
 
       {/* Modals remain the same */}
       {showGenerateFormModal && (
@@ -754,8 +734,8 @@ const TagihanBulanan = () => {
 
       {activeTab === "tab2" && showAllDataModal && (
         <ModalAllData
-        showGenerateExcelModal={showGenerateExcelModal}
-        alamatRumah={selectedDataRT}
+          showGenerateExcelModal={showGenerateExcelModal}
+          alamatRumah={selectedDataRT}
           closeModal={() => {
             closeModal();
             setActiveTab("tab1");

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import EditAmbangModal from "../components/modal/editAmbangModal";
 import Toast from "../components/Toast/successToast";
 import { inconsolata } from "../components/Fonts/fonts";
+import { API_URL } from "../common/api";
 
 export default function AmbangPage() {
   const [data, setData] = useState([]);
@@ -16,7 +17,7 @@ export default function AmbangPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch("http://127.0.0.1:4000/api/v1/ambang");
+        const response = await fetch(`${API_URL}/ambang`);
         const result = await response.json();
         console.log(result);
         if (result.data) {

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Cookie from "js-cookie";
+import { API_URL } from "../common/api";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -13,7 +14,7 @@ const LoginPage = () => {
     e.preventDefault();
     const data = { username, password };
     try {
-      const response = await fetch(`${ROOT_API}/${API_V}`, {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -21,7 +22,7 @@ const LoginPage = () => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      console.log(result.message)
+      console.log(result.message);
       if (response.status == 200) {
         //TAMBAHIN
         Cookie.set("user", JSON.stringify(result.message), {
