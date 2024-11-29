@@ -217,7 +217,7 @@ const DataPelanggan = () => {
   const closeQRCodeModal = () => setQrModalVisible(false);
   const handleCreatePelanggan = async (newData) => {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${API_URL}/pelanggan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newData),

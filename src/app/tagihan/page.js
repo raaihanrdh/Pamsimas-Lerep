@@ -10,6 +10,24 @@ import { FiCamera, FiCameraOff, FiDownload } from "react-icons/fi";
 
 const TagihanBulanan = () => {
   const [dataTagihan, setDataTagihan] = useState([]);
+  const [dataAmbang, setDataAmbang] = useState({
+    ambangMinimum: {
+      meteranUsaha: 0,
+      meteranPribadi: 0
+    },
+    nominalMinimum: {
+      meteranUsaha: 0,
+      meteranPribadi: 0
+    },
+    hargaPerKubik: {
+      meteranUsaha: 0,
+      meteranPribadi: 0
+    },
+    biayaAdmin: {
+      meteranUsaha: 0,
+      meteranPribadi: 0
+    },
+  });
   const [loading, setLoading] = useState(true);
   const [showGenerateExcelModal, setShowGenerateExcelModal] = useState(false);
   const [showGenerateFormModal, setShowGenerateFormModal] = useState(false);
@@ -34,6 +52,7 @@ const TagihanBulanan = () => {
   const [dataRT, setDataRT] = useState([]);
   const [selectedDataRT, setSelectedDataRT] = useState("");
   const [countTagihan, setCountTagihan] = useState(0);
+  const [jenisMeteranSelected, setJenisMeteranSelected] = useState("");
   const [user, setUser] = useState({
     permissions: {
       pelanggan: {
@@ -219,7 +238,45 @@ const TagihanBulanan = () => {
     console.log(dataRT);
   }, [idMeteran]);
 
+  const fetchJenisMeteranSelected = async (idMeteran) => {
+    setLoading(true)
+    try {
+      const response = await axios.get(
+        `${API_URL}/pelanggan/${idMeteran}/detail`
+      );
+      if(response.status === 200) {
+        const data = response.data.data.jenisMeteran;
+        setJenisMeteranSelected(data)
+      }
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const fetchAmbangByRT = async (rw) => {
+    setDataAmbang({}); // Kosongkan data sebelumnya untuk mencegah lag saat refresh
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${API_URL}/ambang?dusunRTRW=${rw}`
+      );
+      if(response.status === 200) {
+        const data = response.data.data;
+        setDataAmbang(data)
+      }
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchTagihanByRT = async (rw) => {
+    fetchAmbangByRT(rw)
     setDataTagihan([]); // Kosongkan data sebelumnya untuk mencegah lag saat refresh
     setLoading(true);
     try {
@@ -362,6 +419,7 @@ const TagihanBulanan = () => {
 
   const handleEditTagihan = (tagihan) => {
     setEditingTagihan(tagihan);
+    fetchJenisMeteranSelected(tagihan.idMeteran)
   };
 
   const handleChangeInput = (e) => {
@@ -370,15 +428,47 @@ const TagihanBulanan = () => {
     let updatedTagihan = { ...editingTagihan, [name]: value };
 
     if (name === "meteranSekarang" && value !== "") {
-      const meteranSebelumnya = editingTagihan.meteranSebelumnya;
-      const meteranHitungan = value - meteranSebelumnya;
-      let totalTagihan = meteranHitungan;
+      
+      const meteranHitungan = updatedTagihan.meteranSekarang - updatedTagihan.meteranSebelumnya
+      
+      var totalTagihan = 0
 
-      if (meteranHitungan < 5) {
-        totalTagihan = 5;
+      let factorTotalTagihan = 0
+      let biayaAdmin = 0
+
+      // Logic penentuan harga
+      if(jenisMeteranSelected) {
+          if(jenisMeteranSelected == 'Pribadi') {
+              if(meteranHitungan <= dataAmbang.ambangMinimum.meteranPribadi) {
+                  totalTagihan = dataAmbang.nominalMinimum.meteranPribadi
+              } else {
+                totalTagihan = meteranHitungan
+                factorTotalTagihan = dataAmbang.hargaPerKubik.meteranPribadi
+                biayaAdmin = dataAmbang.biayaAdmin.meteranPribadi
+                totalTagihan = (((totalTagihan + dataAmbang.ambangMinimum.meteranPribadi) * factorTotalTagihan) + biayaAdmin).toString()
+              }
+          } else {
+              if(meteranHitungan <= dataAmbang.ambangMinimum.meteranUsaha) {
+                totalTagihan = dataAmbang.nominalMinimum.meteranUsaha
+              } else {
+                totalTagihan = meteranHitungan
+                factorTotalTagihan = dataAmbang.hargaPerKubik.meteranUsaha
+                biayaAdmin = dataAmbang.biayaAdmin.meteranUsaha
+                totalTagihan = (((totalTagihan + dataAmbang.ambangMinimum.meteranUsaha) * factorTotalTagihan) + biayaAdmin).toString()
+              }
+          }
+      } else {
+        if(meteranHitungan < dataAmbang.ambangMinimum.meteranPribadi) {
+            totalTagihan = dataAmbang.nominalMinimum.meteranPribadi
+        } else {
+          totalTagihan = meteranHitungan
+          factorTotalTagihan = dataAmbang.hargaPerKubik.meteranPribadi
+          biayaAdmin = dataAmbang.biayaAdmin.meteranPribadi
+          totalTagihan = (((totalTagihan + dataAmbang.ambangMinimum.meteranPribadi) * factorTotalTagihan) + biayaAdmin).toString()
+        }
       }
 
-      updatedTagihan.totalTagihan = totalTagihan * 500;
+      updatedTagihan.totalTagihan = totalTagihan
     }
     if (name === "statusPembayaran" && value === "Lunas") {
       updatedTagihan.tanggalBayar = new Date().toISOString().split("T")[0];
@@ -663,7 +753,11 @@ const TagihanBulanan = () => {
                     </td>
                     <td className="px-6 py-4 text-center border-b border-gray-300">
                       <button
-                        onClick={() => handleEditTagihan(tagihan)}
+                      value={tagihan.idMeteran}
+                        onClick={(event) => {
+                          handleEditTagihan(tagihan);
+                        }
+                        }
                         className="bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded-lg transition duration-200 ease-in-out"
                       >
                         Edit
