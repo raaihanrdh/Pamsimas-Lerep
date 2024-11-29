@@ -13,8 +13,6 @@ const LoginPage = () => {
 
   const ROOT_API = process.env.NEXT_PUBLIC_API;
   const API_V = process.env.NEXT_PUBLIC_API_V;
-
-  // Redirect if already logged in
   useEffect(() => {
     const user = Cookie.get("user");
     if (user) {
@@ -27,7 +25,6 @@ const LoginPage = () => {
     setIsLoading(true);
     setErrorMessage("");
 
-    // Enhanced validation
     const trimmedUsername = username.trim();
     const trimmedPassword = password.trim();
 
@@ -37,7 +34,6 @@ const LoginPage = () => {
       return;
     }
 
-    // Additional validation for username/password format
     if (trimmedUsername.length < 3) {
       setErrorMessage("Username must be at least 3 characters long.");
       setIsLoading(false);
