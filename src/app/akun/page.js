@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_URL } from "../common/api";
-import { withAuth } from "../utils/routerAuth";
+import { getAuth, withAuth } from "../utils/routerAuth";
 
 const AdminDashboard = () => {
   const [accounts, setAccounts] = useState([]);
@@ -16,8 +16,60 @@ const AdminDashboard = () => {
       pelanggan: { create: 0, read: 0, update: 0, delete: 0 },
       tagihan: { create: 0, read: 0, update: 0, delete: 0 },
       pengaduan: { create: 0, read: 0, update: 0, delete: 0 },
+      akun: { create: 0, read: 0, update: 0, delete: 0 },
+      ambang: { create: 0, read: 0, update: 0, delete: 0 },
     },
   });
+
+  const [user, setUser] = useState({
+    permissions: {
+      pelanggan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      tagihan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      pengaduan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      ambang: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      akun: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+    },
+    _id: "",
+    idAkun: "",
+    nama: "",
+    password: "",
+    createdAt: "",
+    updatedAt: "",
+    __v: 0,
+    username: "",
+  });
+
+  useEffect(() => {
+    const authUser = getAuth();
+
+    setUser(authUser);
+    console.log(user.permissions.pelanggan);
+  }, []);
 
   useEffect(() => {
     fetchAccounts();
@@ -46,14 +98,17 @@ const AdminDashboard = () => {
 
   const handleUpdateAccount = async (e) => {
     e.preventDefault();
+    console.log(currentAccount)
     try {
-      await axios.put(
-        API_URL`/akun/${currentAccount.username}/detail`,
+      const update = await axios.put(
+        `${API_URL}/akun/${currentAccount.username}/detail`,
         currentAccount
       );
-      fetchAccounts();
-      setIsEditModalOpen(false);
-      resetCurrentAccount();
+      if(update.status === 200) {
+        fetchAccounts();
+        setIsEditModalOpen(false);
+        resetCurrentAccount();
+      }
     } catch (error) {
       alert("Gagal memperbarui akun: " + error.message);
     }
@@ -79,6 +134,8 @@ const AdminDashboard = () => {
         pelanggan: { create: 0, read: 0, update: 0, delete: 0 },
         tagihan: { create: 0, read: 0, update: 0, delete: 0 },
         pengaduan: { create: 0, read: 0, update: 0, delete: 0 },
+        akun: { create: 0, read: 0, update: 0, delete: 0 },
+        ambang: { create: 0, read: 0, update: 0, delete: 0 },
       },
     });
   };
@@ -115,12 +172,14 @@ const AdminDashboard = () => {
       </h2>
       <div className="bg-white shadow-xl rounded-lg p-5">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl shadow-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 transition-all ease-in-out duration-300"
-          >
-            + Tambah Akun
-          </button>
+          { user.permissions.akun.create === 1 && (
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl shadow-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 transition-all ease-in-out duration-300"
+            >
+              + Tambah Akun
+            </button>
+          ) }
         </div>
         <div className="overflow-x-auto shadow-lg rounded-lg">
           <table className="min-w-full bg-white text-sm text-gray-700">
@@ -130,7 +189,9 @@ const AdminDashboard = () => {
                 <th className="px-6 py-3 text-left">Nama</th>
                 <th className="px-6 py-3 text-left">Username</th>
                 <th className="px-6 py-3 text-left">Permissions</th>
-                <th className="px-6 py-3 text-left">Aksi</th>
+                { (user.permissions.akun.update === 1 || user.permissions.akun.delete=== 1)  && (
+                  <th className="px-6 py-3 text-left">Aksi</th>
+                ) }                
               </tr>
             </thead>
             <tbody>
@@ -145,20 +206,27 @@ const AdminDashboard = () => {
                   <td className="px-6 py-4">
                     {renderPermissions(account.permissions)}
                   </td>
-                  <td className="px-6 py-4 space-x-2">
+                  { (user.permissions.akun.update === 1 || user.permissions.akun.delete === 1) && (
+                    <td className="px-6 py-4 space-x-2">
+                    { user.permissions.akun.update === 1 && (
                     <button
                       onClick={() => openEditModal(account)}
                       className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-all ease-in-out duration-200"
                     >
                       Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteAccount(account.username)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all ease-in-out duration-200"
-                    >
-                      Hapus
-                    </button>
+                    </button>  
+                    ) }
+                    
+                    { user.permissions.akun.delete === 1 && (
+                      <button
+                        onClick={() => handleDeleteAccount(account.username)}
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all ease-in-out duration-200"
+                      >
+                        Hapus
+                      </button>
+                    ) }
                   </td>
+                  ) }     
                 </tr>
               ))}
             </tbody>

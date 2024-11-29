@@ -14,10 +14,62 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { API_URL } from "@/app/common/api";
+import { getAuth, withAuth } from "@/app/utils/routerAuth";
+import { useEffect } from "react";
 
 export default function Navbar({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
+
+  const [user, setUser] = useState({
+    permissions: {
+      pelanggan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      tagihan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      pengaduan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      ambang: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      akun: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+    },
+    _id: "",
+    idAkun: "",
+    nama: "",
+    password: "",
+    createdAt: "",
+    updatedAt: "",
+    __v: 0,
+    username: "",
+  });
+
+  useEffect(() => {
+    const authUser = getAuth();
+
+    setUser(authUser);
+    console.log(user.permissions.pelanggan);
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -56,41 +108,55 @@ export default function Navbar({ children }) {
             >
               <FiHome className="pr-2" size={28} /> Dashboard
             </Link>
-            <Link
-              href="/datapelanggan"
-              className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
-            >
-              <FiBook className="pr-2" size={28} />
-              Data Pelanggan
-            </Link>
-            <Link
-              href="/tagihan"
-              className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
-            >
-              <FiList className="pr-2" size={28} />
-              Tagihan
-            </Link>
-            <Link
-              href="/ambang"
-              className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
-            >
-              <FiSettings className="pr-2" size={28} />
-              Settings Harga
-            </Link>
-            <Link
-              href="/akun"
-              className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
-            >
-              <FiUsers className="pr-2" size={28} />
-              Settings Akun
-            </Link>
-            <Link
-              href="/pengaduan"
-              className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
-            >
-              <FiMessageSquare className="pr-2" size={28} />
-              Pengaduan
-            </Link>
+            { user.permissions.pelanggan.read === 1 && (
+              <Link
+                href="/datapelanggan"
+                className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
+              >
+                <FiBook className="pr-2" size={28} />
+                Data Pelanggan
+              </Link>
+            ) }
+            
+            { user.permissions.tagihan.read === 1 && (
+              <Link
+                href="/tagihan"
+                className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
+              >
+                <FiList className="pr-2" size={28} />
+                Tagihan
+              </Link>
+            ) }
+            
+            { user.permissions.ambang.read === 1 && (
+              <Link
+                href="/ambang"
+                className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
+              >
+                <FiSettings className="pr-2" size={28} />
+                Settings Harga
+              </Link>
+            ) }
+            
+            { user.permissions.akun.read === 1 && (
+              <Link
+                href="/akun"
+                className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
+              >
+                <FiUsers className="pr-2" size={28} />
+                Settings Akun
+              </Link>
+            ) }
+            
+            { user.permissions.pengaduan.read === 1 && (
+              <Link
+                href="/pengaduan"
+                className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
+              >
+                <FiMessageSquare className="pr-2" size={28} />
+                Pengaduan
+              </Link>
+            ) }
             <button
               onClick={handleLogout}
               className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
