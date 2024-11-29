@@ -132,7 +132,7 @@ const PengaduanPage = () => {
     }
 
     try {
-      const response = await fetch(API_URL`pengaduan/${idPengaduan}/detail`, {
+      const response = await fetch(`${API_URL}/pengaduan/${idPengaduan}/detail`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
