@@ -14,7 +14,7 @@ const Toast = ({ type, message, isOpen, onClose }) => {
     switch (type) {
       case "success":
         return "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200";
-      case "danger":
+      case "error":
         return "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200";
       case "warning":
         return "bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200";

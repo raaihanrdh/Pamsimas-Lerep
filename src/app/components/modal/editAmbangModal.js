@@ -20,12 +20,13 @@ export default function EditAmbangModal({
     biayaAdminPribadi: editData.biayaAdmin.meteranPribadi,
   });
 
-  const [updateAllDusun, setUpdateAllDusun] = useState(false);
+  const [updateAllDusun, setUpdateAllDusun] = useState(false); // Manage the checkbox state
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -34,12 +35,16 @@ export default function EditAmbangModal({
     }));
   };
 
+  // Handle checkbox change to toggle updating all dusun
+  const handleCheckboxChange = (e) => {
+    setUpdateAllDusun(e.target.checked);
+  };
+
+  // Save the data when form is submitted
   const handleSave = async () => {
-    // Prevent multiple submissions
     if (isLoading) return;
 
     const updatedData = {
-      ...editData,
       ambangMinimum: {
         meteranUsaha: formData.ambangMinimumUsaha,
         meteranPribadi: formData.ambangMinimumPribadi,
@@ -62,7 +67,7 @@ export default function EditAmbangModal({
 
     try {
       const endpoint = updateAllDusun
-        ? `${API_URL}/ambang`
+        ? `${API_URL}/ambang` // Endpoint for updating all dusun
         : `${API_URL}/ambang/${editData.dusunRTRW}`;
 
       const response = await fetch(endpoint, {
@@ -76,30 +81,36 @@ export default function EditAmbangModal({
       const result = await response.json();
 
       if (response.ok) {
-        // Directly fetch fresh data instead of manually updating
-        await fetchData();
+        // Success handling for specific or all dusun update
+        if (!updateAllDusun && result.data.modifiedCount > 0) {
+          setToastType("success");
+          setResponseMessage(result.message || "Update Data Dusun Berhasil.");
+        } else if (updateAllDusun) {
+          setToastType("success");
+          setResponseMessage("Update Data Untuk Semua Dusun Berhasil.");
+        } else {
+          setToastType("error");
+          setResponseMessage(result.message || "Update gagal.");
+        }
 
-        setModalOpen(false);
-        setToastType("success");
-        setResponseMessage(
-          updateAllDusun
-            ? "Update Data Untuk Semua Dusun Berhasil."
-            : "Update Data Berhasil."
-        );
+        // Optionally refresh data after successful update
+        if (fetchData) {
+          fetchData();
+        }
       } else {
         setToastType("error");
-        setResponseMessage(result.message || "Update Gagal.");
+        setResponseMessage(
+          result.message || "Terjadi kesalahan saat memperbarui data."
+        );
       }
     } catch (error) {
-      console.error("Error updating ambang data:", error);
+      console.error("Error updating ambang data:", error.message);
       setToastType("error");
       setResponseMessage("Terjadi kesalahan saat memperbarui data.");
     } finally {
       setIsLoading(false);
       setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-      }, 3000);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
 
@@ -225,15 +236,14 @@ export default function EditAmbangModal({
 
           {/* Update All Dusun Checkbox */}
           <div className="flex items-center mt-4">
-            <input
-              type="checkbox"
-              id="updateAllDusun"
-              checked={updateAllDusun}
-              onChange={() => setUpdateAllDusun(!updateAllDusun)}
-              className="mr-2"
-            />
-            <label htmlFor="updateAllDusun" className="text-sm text-gray-700">
-              Update untuk semua Dusun RT/RW
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                checked={updateAllDusun}
+                onChange={handleCheckboxChange}
+                className="form-checkbox"
+              />
+              <span className="ml-2">Update Semua Dusun</span>
             </label>
           </div>
         </div>
@@ -247,9 +257,14 @@ export default function EditAmbangModal({
           </button>
           <button
             onClick={handleSave}
-            className="py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+            disabled={isLoading}
+            className={`py-2 px-4 rounded text-sm ${
+              isLoading
+                ? "bg-blue-300 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }`}
           >
-            Simpan
+            {isLoading ? "Menyimpan..." : "Simpan"}
           </button>
         </div>
       </div>

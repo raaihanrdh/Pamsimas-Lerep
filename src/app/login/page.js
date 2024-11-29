@@ -177,15 +177,11 @@ const LoginPage = () => {
                 {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
               </button>
             </div>
-
-            {/* Error Message */}
             {errorMessage && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
                 {errorMessage}
               </div>
             )}
-
-            {/* Login Button */}
             <button
               type="submit"
               disabled={isLoading}

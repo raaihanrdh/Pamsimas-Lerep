@@ -58,22 +58,21 @@ const AmbangPage = () => {
     console.log(user.permissions.pelanggan);
   }, []);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch(`${API_URL}/ambang`);
-        const result = await response.json();
-        console.log(result);
-        if (result.data) {
-          setData(result.data);
-        }
-      } catch (error) {
-        console.error("Error fetching ambang data:", error);
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${API_URL}/ambang`);
+      const result = await response.json();
+      if (result.data) {
+        setData(result.data);
       }
+    } catch (error) {
+      console.error("Error fetching ambang data:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -102,7 +101,6 @@ const AmbangPage = () => {
           </div>
         ) : (
           <>
-            {/* Dropdown untuk memilih Dusun */}
             <div className="mb-4">
               <label
                 htmlFor="dusun"
@@ -258,11 +256,11 @@ const AmbangPage = () => {
         {modalOpen && editData && (
           <EditAmbangModal
             editData={editData}
-            setEditData={setEditData}
             setModalOpen={setModalOpen}
-            setData={setData}
+            fetchData={fetchData} // Pastikan ini diteruskan
           />
         )}
+
         {showToast && (
           <Toast
             type={toastType}

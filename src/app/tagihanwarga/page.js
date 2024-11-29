@@ -13,7 +13,6 @@ const TagihanPelanggan = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch RT/RW data on component mount
   useEffect(() => {
     const fetchRT = async () => {
       try {
@@ -28,7 +27,6 @@ const TagihanPelanggan = () => {
     fetchRT();
   }, []);
 
-  // Fetch tagihan when RT and ID Meteran are selected
   const fetchTagihan = async () => {
     if (!selectedRT || !idMeteran) {
       setError("Silakan pilih RT/RW dan masukkan ID Meteran");
