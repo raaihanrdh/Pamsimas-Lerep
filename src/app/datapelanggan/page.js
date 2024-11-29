@@ -169,7 +169,7 @@ const DataPelanggan = () => {
 
     try {
       const response = await fetch(
-        `${API_URL}/${updatedData.idMeteran}/detail`,
+        `${API_URL}/pelanggan/${updatedData.idMeteran}/detail`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
