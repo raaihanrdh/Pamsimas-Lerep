@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { FiX } from "react-icons/fi";
+import { API_URL } from "@/app/common/api";
 import Toast from "../Toast/successToast";
 
 export default function EditAmbangModal({
   editData,
-  setEditData,
   setModalOpen,
   setData,
+  fetchData, // Add a prop to fetch fresh data after update
 }) {
   const [formData, setFormData] = useState({
     ambangMinimumUsaha: editData.ambangMinimum.meteranUsaha,
@@ -18,6 +20,12 @@ export default function EditAmbangModal({
     biayaAdminPribadi: editData.biayaAdmin.meteranPribadi,
   });
 
+  const [updateAllDusun, setUpdateAllDusun] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState("");
+  const [responseMessage, setResponseMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -26,11 +34,10 @@ export default function EditAmbangModal({
     }));
   };
 
-  const [showToast, setShowToast] = useState(false);
-  const [toastType, setToastType] = useState("");
-  const [responseMessage, setResponseMessage] = useState("");
-
   const handleSave = async () => {
+    // Prevent multiple submissions
+    if (isLoading) return;
+
     const updatedData = {
       ...editData,
       ambangMinimum: {
@@ -51,156 +58,202 @@ export default function EditAmbangModal({
       },
     };
 
+    setIsLoading(true);
+
     try {
-      const response = await fetch(
-        `http://127.0.0.1:4000/api/v1/ambang/${editData.dusunRTRW}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedData),
-        }
-      );
+      const endpoint = updateAllDusun
+        ? `${API_URL}/ambang`
+        : `${API_URL}/ambang/${editData.dusunRTRW}`;
+
+      const response = await fetch(endpoint, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
 
       const result = await response.json();
 
-      if (response.status === 200) {
+      if (response.ok) {
+        // Directly fetch fresh data instead of manually updating
+        await fetchData();
+
         setModalOpen(false);
         setToastType("success");
-        setResponseMessage("Update Data Berhasil.");
-        setData((prevData) =>
-          prevData.map((item) =>
-            item.dusunRTRW === editData.dusunRTRW ? updatedData : item
-          )
+        setResponseMessage(
+          updateAllDusun
+            ? "Update Data Untuk Semua Dusun Berhasil."
+            : "Update Data Berhasil."
         );
       } else {
         setToastType("error");
-        setResponseMessage("Update Gagal.");
+        setResponseMessage(result.message || "Update Gagal.");
       }
     } catch (error) {
       console.error("Error updating ambang data:", error);
       setToastType("error");
       setResponseMessage("Terjadi kesalahan saat memperbarui data.");
+    } finally {
+      setIsLoading(false);
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
     }
-    setShowToast(true);
-    setTimeout(() => {
-      setShowToast(false);
-    }, 3000); // Hide toast after 3 seconds
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg w-96">
-        <h3 className="text-xl font-semibold mb-4">Edit Data Ambang</h3>
-
-        {/* Form input untuk Ambang Minimum */}
-        <div className="mb-4">
-          <label className="block mb-1">Ambang Minimum Usaha</label>
-          <input
-            type="number"
-            name="ambangMinimumUsaha"
-            value={formData.ambangMinimumUsaha}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Ambang Minimum Pribadi</label>
-          <input
-            type="number"
-            name="ambangMinimumPribadi"
-            value={formData.ambangMinimumPribadi}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        {/* Form input untuk Nominal Minimum */}
-        <div className="mb-4">
-          <label className="block mb-1">Nominal Minimum Usaha</label>
-          <input
-            type="number"
-            name="nominalMinimumUsaha"
-            value={formData.nominalMinimumUsaha}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Nominal Minimum Pribadi</label>
-          <input
-            type="number"
-            name="nominalMinimumPribadi"
-            value={formData.nominalMinimumPribadi}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        {/* Form input untuk Harga Per Kubik */}
-        <div className="mb-4">
-          <label className="block mb-1">Harga Per Kubik Usaha</label>
-          <input
-            type="number"
-            name="hargaPerKubikUsaha"
-            value={formData.hargaPerKubikUsaha}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Harga Per Kubik Pribadi</label>
-          <input
-            type="number"
-            name="hargaPerKubikPribadi"
-            value={formData.hargaPerKubikPribadi}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        {/* Form input untuk Biaya Admin */}
-        <div className="mb-4">
-          <label className="block mb-1">Biaya Admin Usaha</label>
-          <input
-            type="number"
-            name="biayaAdminUsaha"
-            value={formData.biayaAdminUsaha}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Biaya Admin Pribadi</label>
-          <input
-            type="number"
-            name="biayaAdminPribadi"
-            value={formData.biayaAdminPribadi}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        <div className="flex justify-end space-x-3">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 p-4">
+      <div className="bg-white p-6 rounded-lg w-full max-w-md mx-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Edit Data Ambang</h3>
           <button
             onClick={() => setModalOpen(false)}
-            className="py-2 px-4 bg-gray-300 text-white rounded hover:bg-gray-400"
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <FiX size={24} />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {/* Ambang Minimum Section */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-1 text-sm">Ambang Minimum Usaha</label>
+              <input
+                type="number"
+                name="ambangMinimumUsaha"
+                value={formData.ambangMinimumUsaha}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-sm">
+                Ambang Minimum Pribadi
+              </label>
+              <input
+                type="number"
+                name="ambangMinimumPribadi"
+                value={formData.ambangMinimumPribadi}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Nominal Minimum Section */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-1 text-sm">
+                Nominal Minimum Usaha
+              </label>
+              <input
+                type="number"
+                name="nominalMinimumUsaha"
+                value={formData.nominalMinimumUsaha}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-sm">
+                Nominal Minimum Pribadi
+              </label>
+              <input
+                type="number"
+                name="nominalMinimumPribadi"
+                value={formData.nominalMinimumPribadi}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Harga Per Kubik Section */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-1 text-sm">
+                Harga Per Kubik Usaha
+              </label>
+              <input
+                type="number"
+                name="hargaPerKubikUsaha"
+                value={formData.hargaPerKubikUsaha}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-sm">
+                Harga Per Kubik Pribadi
+              </label>
+              <input
+                type="number"
+                name="hargaPerKubikPribadi"
+                value={formData.hargaPerKubikPribadi}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Biaya Admin Section */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-1 text-sm">Biaya Admin Usaha</label>
+              <input
+                type="number"
+                name="biayaAdminUsaha"
+                value={formData.biayaAdminUsaha}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-sm">Biaya Admin Pribadi</label>
+              <input
+                type="number"
+                name="biayaAdminPribadi"
+                value={formData.biayaAdminPribadi}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Update All Dusun Checkbox */}
+          <div className="flex items-center mt-4">
+            <input
+              type="checkbox"
+              id="updateAllDusun"
+              checked={updateAllDusun}
+              onChange={() => setUpdateAllDusun(!updateAllDusun)}
+              className="mr-2"
+            />
+            <label htmlFor="updateAllDusun" className="text-sm text-gray-700">
+              Update untuk semua Dusun RT/RW
+            </label>
+          </div>
+        </div>
+
+        <div className="flex justify-end space-x-3 mt-6">
+          <button
+            onClick={() => setModalOpen(false)}
+            className="py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-sm"
           >
             Batal
           </button>
           <button
             onClick={handleSave}
-            className="py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
           >
             Simpan
           </button>
         </div>
       </div>
+
       {showToast && (
         <Toast
           type={toastType}

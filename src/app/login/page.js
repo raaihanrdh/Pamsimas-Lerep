@@ -1,19 +1,57 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Cookie from "js-cookie";
 import axios from "axios";
-import { API_URL } from "../common/api";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const ROOT_API = process.env.NEXT_PUBLIC_API;
   const API_V = process.env.NEXT_PUBLIC_API_V;
 
+  // Redirect if already logged in
+  useEffect(() => {
+    const user = Cookie.get("user");
+    if (user) {
+      window.location.href = "/dashboard";
+    }
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    const data = { username, password };
+    setIsLoading(true);
+    setErrorMessage("");
+
+    // Enhanced validation
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedUsername || !trimmedPassword) {
+      setErrorMessage("Username and password cannot be empty.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Additional validation for username/password format
+    if (trimmedUsername.length < 3) {
+      setErrorMessage("Username must be at least 3 characters long.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (trimmedPassword.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long.");
+      setIsLoading(false);
+      return;
+    }
+
+    const data = { username: trimmedUsername, password: trimmedPassword };
+
     try {
       const config = {
         headers: {
@@ -22,81 +60,88 @@ const LoginPage = () => {
         },
       };
 
-      console.log(data);
-
-    console.log("TEST")
-
       const response = await axios.post(
         `${ROOT_API}/${API_V}`,
         JSON.stringify(data),
         config
       );
-      // const response = await fetch(`${ROOT_API}/${API_V}`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(data),
-      // });
-      const result = await response.data;
-      console.log(result.message);
-      if (response.status == 200) {
-        //TAMBAHIN
+      const result = response.data;
+
+      if (response.status === 200) {
+        // More secure cookie setting
         Cookie.set("user", JSON.stringify(result.message), {
           expires: 1,
+          secure: process.env.NODE_ENV === "production", // Only send cookie over HTTPS in production
+          sameSite: "strict", // Protects against CSRF
         });
-        //------
-
-        window.location.href = "dashboard"; // Redirect ke halaman Dashboard
+        window.location.href = "/dashboard";
       } else {
-        // Jika login gagal
-        setErrorMessage(result.message || "Login failed. Please try again.");
+        setErrorMessage("Invalid username or password.");
       }
     } catch (error) {
-      console.log(error);
-      setErrorMessage("An error occurred. Please try again later.");
+      console.error(error);
+      if (error.response && error.response.data) {
+        setErrorMessage(
+          error.response.data.message ||
+            "A server error occurred. Please try again later."
+        );
+      } else {
+        setErrorMessage("A server error occurred. Please try again later.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen">
-      {/* Left Side */}
-      <div className="hidden md:flex w-full md:w-1/2 bg-gradient-to-r from-blue-50 to-blue-100 items-center justify-center">
-        <div className="text-center px-6">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-sky-300  to-sky-600">
+      {/* Left Side - Mobile Hidden */}
+      <div className="hidden md:flex w-full md:w-1/2 items-center justify-center p-8">
+        <div className="text-center">
           <img
-            src="https://via.placeholder.com/300"
-            alt="Illustration"
-            className="w-3/4 mx-auto drop-shadow-lg"
+            src="/logo.svg"
+            alt="PAMSIMAS Logo"
+            className="mx-auto w-3/4 mb-6 animate-float"
           />
-          <h1 className="text-3xl font-bold text-sky-400 mt-6">
-            Welcome to PAMSIMAS
-          </h1>
-          <p className="text-gray-600 mt-3 text-lg leading-relaxed">
-            Manage your system efficiently and make a difference in your
-            community.
+          <h1 className="text-4xl font-bold text-sky-100 mb-2">PAMSIMAS</h1>
+          <p className="text-white text-md max-w-md mx-auto">
+            Empowering communities through efficient water management systems
           </p>
+          <footer className="mt-12 text-xs text-gray-300">
+            <p>
+              © 2024 <span className="font-bold">KKNT Desa Lerep</span>. All
+              Rights Reserved.
+            </p>
+          </footer>
         </div>
       </div>
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-2xl border border-sky-100 p-8 transform transition-all hover:scale-105 duration-300">
+          <div className="md:hidden text-center mb-6">
+            <img
+              src="/logo.svg"
+              alt="PAMSIMAS Logo"
+              className="mx-auto h-24 w-24 mb-4"
+            />
+            <h1 className="text-2xl font-bold text-sky-600">PAMSIMAS</h1>
+          </div>
 
-      {/* Right Side */}
-      <div className="w-full md:w-1/2 flex items-center justify-center bg-gradient-to-r from-sky-400 to-sky-600">
-        <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-3xl">
-          <h2 className="text-3xl font-bold text-center text-sky-400">
-            Welcome Back!
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-sky-600 mb-2">
+            Welcome Back
           </h2>
-          <p className="text-sm text-center text-gray-500 mb-8">
-            Enter your credentials to access the app
+          <p className="text-sm text-center text-gray-500 mb-6">
+            Sign in to continue to your dashboard
           </p>
 
           {/* Form */}
-          <form className="space-y-6" onSubmit={handleLogin}>
+          <form onSubmit={handleLogin} className="space-y-4">
             {/* Username Input */}
             <div>
               <label
                 htmlFor="username"
-                className="block text-gray-700 font-medium"
+                className="block text-gray-700 font-medium mb-2"
               >
-                ID
+                Username
               </label>
               <input
                 type="text"
@@ -105,43 +150,57 @@ const LoginPage = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400 transition duration-300"
+                required
               />
             </div>
 
             {/* Password Input */}
-            <div>
+            <div className="relative">
               <label
                 htmlFor="password"
-                className="block text-gray-700 font-medium"
+                className="block text-gray-700 font-medium mb-2"
               >
                 Password
               </label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400 transition duration-300 pr-12"
+                required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-12 transform -translate-y-1/2 text-gray-500 hover:text-sky-600"
+              >
+                {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              </button>
             </div>
 
             {/* Error Message */}
             {errorMessage && (
-              <div className="text-red-500 text-center">{errorMessage}</div>
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
+                {errorMessage}
+              </div>
             )}
 
             {/* Login Button */}
-            <div className="flex justify-center">
-              <button
-                type="submit"
-                className="py-3 px-7 bg-sky-500 rounded-full hover:bg-blue-500 text-white font-medium shadow-md transition duration-300"
-              >
-                Login
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 bg-sky-500 text-white rounded-lg hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-opacity-50 transition duration-300 flex items-center justify-center"
+            >
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              ) : (
+                "Login"
+              )}
+            </button>
           </form>
         </div>
       </div>

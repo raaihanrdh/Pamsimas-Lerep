@@ -1,72 +1,98 @@
 import { useState } from "react";
+import { FiLoader } from "react-icons/fi";
 
 export default function GenerateTagihanModal({ closeModal, alamatRumah }) {
-  const [bulanTagihan, setBulanTagihan] = useState("Januari");
-  const [tahunTagihan, setTahunTagihan] = useState("2024");
-
+  const [bulanTagihan, setBulanTagihan] = useState("");
+  const [tahunTagihan, setTahunTagihan] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // State untuk status loading
   const [excelData, setExcelData] = useState(null);
   const ROOT_API = process.env.NEXT_PUBLIC_API;
   const API_V = process.env.NEXT_PUBLIC_API_V;
 
   const handleGenerate = async () => {
-    if(bulanTagihan && tahunTagihan && alamatRumah) {
-        const response = await fetch(`${ROOT_API}/${API_V}/generatetagihan?alamatRumah=${alamatRumah}&bulanTagihan=${bulanTagihan}&tahunTagihan=${tahunTagihan}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
-          });
-      
-          if(response.status === 200) {
-              const blob = await response.blob();
-      
-              const url = URL.createObjectURL(blob);
-          
-              setExcelData(url);
-          } else {
-              console.log('Data Kosong!')
-          }
-    } else {
-        console.log('Isi seluruh isian')
+    if (!bulanTagihan) {
+      setErrorMessage("Harap pilih bulan terlebih dahulu.");
+      return;
     }
-    
-    // closeModal();
+
+    if (!tahunTagihan) {
+      setErrorMessage("Harap pilih tahun terlebih dahulu.");
+      return;
+    }
+
+    setIsLoading(true); // Set loading true saat tombol ditekan
+
+    if (alamatRumah) {
+      const response = await fetch(
+        `${ROOT_API}/${API_V}/generatetagihan?alamatRumah=${alamatRumah}&bulanTagihan=${bulanTagihan}&tahunTagihan=${tahunTagihan}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.status === 200) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        setExcelData(url);
+        setErrorMessage(""); // Reset pesan error setelah sukses
+
+        // Trigger download otomatis setelah excelData di-set
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `tagihan_${bulanTagihan}_${tahunTagihan}_${alamatRumah}.xlsx`;
+        link.click();
+        closeModal(); // Close modal setelah download
+      } else {
+        setErrorMessage("Data tidak ditemukan. Silakan coba lagi.");
+      }
+    } else {
+      setErrorMessage("Alamat rumah tidak valid.");
+    }
+
+    setIsLoading(false); // Reset loading setelah selesai
   };
 
-  const handleBulanTagihan = async (value) => {
-    setBulanTagihan(value)
-    console.log(`BULAN : ${value}`)
-  }
+  const handleBulanTagihan = (value) => {
+    setBulanTagihan(value);
+    setErrorMessage("");
+  };
 
-  const handleTahunTagihan = async (value) => {
-    setTahunTagihan(value)
-    console.log(`TAHUN : ${value}`)
-  }
+  const handleTahunTagihan = (value) => {
+    setTahunTagihan(value);
+    setErrorMessage("");
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
       <div className="relative w-full max-w-lg p-8 bg-white rounded-xl shadow-lg">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-          Tambah Data Pelanggan
-        </h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6"></h2>
         <div className="space-y-5">
           {/* Bulan */}
           <div>
             <label className="block text-sm font-medium text-gray-600">
               Pilih Bulan
             </label>
-            <select id="mySelect"
-            onChange={(e) => handleBulanTagihan(e.target.value)}>
-                <option value="01">Januari</option>
-                <option value="02">Februari</option>
-                <option value="03">Maret</option>
-                <option value="04">April</option>
-                <option value="05">Mei</option>
-                <option value="06">Juni</option>
-                <option value="07">Juli</option>
-                <option value="08">Agustus</option>
-                <option value="09">September</option>
-                <option value="10">Oktober</option>
-                <option value="11">November</option>
-                <option value="12">Desember</option>
+            <select
+              id="bulanSelect"
+              value={bulanTagihan}
+              onChange={(e) => handleBulanTagihan(e.target.value)}
+              className="w-full py-2 px-3 border border-gray-400 rounded-md shadow-sm focus:ring-sky-400 focus:border-sky-400"
+            >
+              <option value="">--Pilih Bulan--</option>
+              <option value="01">Januari</option>
+              <option value="02">Februari</option>
+              <option value="03">Maret</option>
+              <option value="04">April</option>
+              <option value="05">Mei</option>
+              <option value="06">Juni</option>
+              <option value="07">Juli</option>
+              <option value="08">Agustus</option>
+              <option value="09">September</option>
+              <option value="10">Oktober</option>
+              <option value="11">November</option>
+              <option value="12">Desember</option>
             </select>
           </div>
           {/* Tahun */}
@@ -74,15 +100,24 @@ export default function GenerateTagihanModal({ closeModal, alamatRumah }) {
             <label className="block text-sm font-medium text-gray-600">
               Pilih Tahun
             </label>
-            <select id="mySelect"
-            onChange={(e) => handleTahunTagihan(e.target.value)}>
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
+            <select
+              id="tahunSelect"
+              value={tahunTagihan}
+              onChange={(e) => handleTahunTagihan(e.target.value)}
+              className="w-full py-2 px-3 border-gray-400 rounded-md border shadow-sm focus:ring-sky-400 focus:border-sky-400"
+            >
+              <option value="">--Pilih Tahun--</option>
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
             </select>
           </div>
         </div>
+        {/* Pesan Error */}
+        {errorMessage && (
+          <p className="mt-2 text-sm text-red-600">{errorMessage}</p>
+        )}
         {/* Tombol */}
         <div className="mt-6 flex justify-end space-x-3">
           <button
@@ -93,15 +128,18 @@ export default function GenerateTagihanModal({ closeModal, alamatRumah }) {
           </button>
           <button
             onClick={handleGenerate}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={isLoading} // Disable tombol jika sedang loading
+            className="px-4 py-2 text-sm font-medium text-white bg-sky-400 rounded-lg shadow-md hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-600"
           >
-            Generate Excel
+            {isLoading ? (
+              <span className="animate-spin">
+                {" "}
+                <FiLoader size={28} />
+              </span>
+            ) : (
+              "Generate Excel"
+            )}
           </button>
-          {excelData && (
-              <a href={excelData} onClick={closeModal} download={`tagihan_${bulanTagihan}_${tahunTagihan}_${alamatRumah}.xlsx`}>
-                Download Excel
-              </a>
-          )}
         </div>
       </div>
     </div>

@@ -3,8 +3,9 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Nav/navbar";
 import Toast from "../components/Toast/successToast";
 import { API_URL } from "../common/api";
+import { withAuth } from "../utils/routerAuth";
 
-const Page = () => {
+const PengaduanPage = () => {
   const [pengaduan, setPengaduan] = useState([]);
   const [newComplaint, setNewComplaint] = useState({
     idMeteran: "",
@@ -24,7 +25,6 @@ const Page = () => {
     const fetchPengaduan = async () => {
       const response = await fetch(`${API_URL}/pengaduan`);
       const data = await response.json();
-      // Sortir pengaduan berdasarkan createdAt (pastikan field ini ada di response API)
       const sortedData = data.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
@@ -33,8 +33,6 @@ const Page = () => {
     };
     fetchPengaduan();
   }, []);
-
-  // Handle item pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredPengaduan.slice(
@@ -434,4 +432,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuth(PengaduanPage);

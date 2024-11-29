@@ -1,15 +1,12 @@
 "use client";
-
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ModalAllData from "../components/modal/allTagihan";
 import { Html5Qrcode } from "html5-qrcode";
-
-import { FiCode, FiSquare, FiXSquare } from "react-icons/fi";
-import { useRouter } from "next/navigation";
-import { getAuth } from "../utils/routerAuth";
+import { getAuth, withAuth } from "../utils/routerAuth";
 import GenerateTagihanModal from "../components/modal/generatetagihanmodal";
 import { API_URL } from "../common/api";
+import { FiCamera, FiCameraOff, FiDownload } from "react-icons/fi";
 
 const TagihanBulanan = () => {
   const [dataTagihan, setDataTagihan] = useState([]);
@@ -19,8 +16,9 @@ const TagihanBulanan = () => {
   const [showAllDataModal, setShowAllDataModal] = useState(false);
   const [editingTagihan, setEditingTagihan] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState("");
 
-  // New state for pagination, search, and filtering
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,21 +26,14 @@ const TagihanBulanan = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [activeTab, setActiveTab] = useState("tab1");
 
-  // Scanner
   const [showScanner, setShowScanner] = useState(false);
   const [cameraError, setCameraError] = useState(null);
   const [cameraScanner, setCameraScanner] = useState(null);
   const [idMeteran, setIdMeteran] = useState("");
 
-  const ROOT_API = process.env.NEXT_PUBLIC_API;
-  const API_V = process.env.NEXT_PUBLIC_API_V;
-
   const [dataRT, setDataRT] = useState([]);
   const [selectedDataRT, setSelectedDataRT] = useState("");
   const [countTagihan, setCountTagihan] = useState(0);
-
-  // AUTH
-  const router = useRouter();
   const [user, setUser] = useState({
     permissions: {
       pelanggan: {
@@ -96,7 +87,7 @@ const TagihanBulanan = () => {
     const html5Qrcode = new Html5Qrcode("reader");
     setCameraScanner(html5Qrcode);
 
-    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+    const qrCodeSuccessCallback = (decodedText) => {
       html5Qrcode
         .stop()
         .then(() => {
@@ -189,7 +180,6 @@ const TagihanBulanan = () => {
           )
         );
       }
-
       setFilteredData(result);
       setCurrentPage(1);
     };
@@ -230,11 +220,8 @@ const TagihanBulanan = () => {
   }, [idMeteran]);
 
   const fetchTagihanByRT = async (rw) => {
-    setDataTagihan([]);
-    console.log(rw)
-    setSelectedDataRT(rw)
-    
-    setIdMeteran("");
+    setDataTagihan([]); // Kosongkan data sebelumnya untuk mencegah lag saat refresh
+    setLoading(true);
     try {
       const response = await axios.get(
         `${API_URL}/tagihan/now?alamatRumah=${rw}`
@@ -242,27 +229,24 @@ const TagihanBulanan = () => {
       const data = response.data.data;
 
       if (Array.isArray(data)) {
-        setDataTagihan(data);
-        setFilteredData(data);
+        setDataTagihan(data); // Data berhasil diterima
       } else {
         console.error("Data tagihan bukan array:", data);
-        setDataTagihan([]);
-        setFilteredData([]);
       }
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
       setLoading(false);
     }
+  };
 
+  useEffect(() => {
     let result = [...dataTagihan];
 
-    // Apply status filter
     if (statusFilter !== "all") {
       result = result.filter((item) => item.statusPembayaran === statusFilter);
     }
 
-    // Apply search
     if (searchQuery) {
       result = result.filter((item) =>
         Object.values(item).some(
@@ -275,7 +259,7 @@ const TagihanBulanan = () => {
 
     setFilteredData(result);
     setCurrentPage(1);
-  };
+  }, [dataTagihan, statusFilter, searchQuery]);
 
   useEffect(() => {
     let result = [...dataTagihan];
@@ -331,12 +315,9 @@ const TagihanBulanan = () => {
       setLoading(false);
     }
   };
-
-  // Previous handlers...
   const handleGenerateTagihan = async () => {
     try {
       console.log("Tagihan sedang di generate...");
-      // Generate tagihan
       const response = await axios.post(`${API_URL}/tagihan/generate`);
       if (response.status == 200) {
         alert("Tagihan berhasil digenerate!");
@@ -400,7 +381,7 @@ const TagihanBulanan = () => {
       updatedTagihan.totalTagihan = totalTagihan * 500;
     }
     if (name === "statusPembayaran" && value === "Lunas") {
-      updatedTagihan.tanggalBayar = new Date().toISOString().split("T")[0]; // Set tanggal bayar hari ini
+      updatedTagihan.tanggalBayar = new Date().toISOString().split("T")[0];
     }
 
     setEditingTagihan(updatedTagihan);
@@ -465,23 +446,25 @@ const TagihanBulanan = () => {
             All Data
           </button>
         </div>
-        {user.permissions.tagihan.create === 1 && (
-          <button
-            onClick={() => setShowGenerateExcelModal(true)}
-            className="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600"
-          >
-            Generate Excel
-          </button>
-        )}
+        <div className="flex space-x-2">
+          {user.permissions.tagihan.create === 1 && (
+            <button
+              onClick={() => setShowGenerateExcelModal(true)}
+              className="flex items-center bg-green-600 px-4 py-2 rounded-lg text-white hover:bg-green-700"
+            >
+              <FiDownload className="mr-3" /> Excel
+            </button>
+          )}
 
-        {user.permissions.tagihan.read === 1 && (
-          <button
-            onClick={requestCameraPermission}
-            className="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600"
-          >
-            Pindai Tagihan
-          </button>
-        )}
+          {user.permissions.tagihan.read === 1 && (
+            <button
+              onClick={requestCameraPermission}
+              className="flex items-center bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600"
+            >
+              <FiCamera className="mr-3" /> Scan
+            </button>
+          )}
+        </div>
       </div>
 
       {showGenerateExcelModal && (
@@ -878,4 +861,4 @@ const TagihanBulanan = () => {
   );
 };
 
-export default TagihanBulanan;
+export default withAuth(TagihanBulanan);

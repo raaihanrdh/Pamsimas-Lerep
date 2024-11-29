@@ -1,56 +1,83 @@
 import React from "react";
-import { FiAlertCircle, FiCopy, FiFileText, FiSearch } from "react-icons/fi";
+import { FiAlertCircle, FiFileText, FiSearch, FiLogIn } from "react-icons/fi";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-sky-400 flex items-center justify-center p-4">
-      <div className="text-center p-8 rounded-lg shadow-2xl bg-white max-w-md w-full">
-        <div className="flex justify-center mb-6">
-          <img
-            src="/api/placeholder/100/100"
-            alt="PAMSIMAS Logo"
-            className="w-24 h-24 rounded-full border-4 border-sky-400"
-          />
-        </div>
-        <h1 className="text-3xl font-bold text-sky-700 mb-4">PAMSIMAS</h1>
-        <p className="text-gray-600 mb-8">
-          Pilih salah satu layanan berikut untuk mengelola kebutuhan Anda:
-        </p>
+    <div className="min-h-screen  bg-gradient-to-br from-sky-400 via-sky-500 to-sky-600 flex flex-col items-center justify-center text-white relative">
+      {/* Header */}
+      <header className="absolute top-0 left-0 w-full flex justify-between items-center p-6">
+        <h1 className="text-2xl font-bold">PAMSIMAS</h1>
+        <a
+          href="/login"
+          className="flex items-center gap-2 py-2 px-4 bg-white text-sky-500 rounded-full shadow-lg hover:bg-sky-600 hover:text-white transition duration-300"
+        >
+          <FiLogIn />
+          Sign In
+        </a>
+      </header>
 
-        <div className="space-y-4">
-          {/* Tombol Tagihan */}
-          <a
-            href="/tagihanwarga"
-            className="flex items-center justify-center py-3 px-6 rounded-full border-2 border-sky-400 text-sky-600 hover:bg-sky-500 hover:text-white transition duration-300 ease-in-out group"
-          >
-            <FiFileText className="mr-3 group-hover:text-white" />
-            Lihat Tagihan
-          </a>
+      {/* Hero Section */}
+      <div className="text-center mt-20 px-6">
+        <div className="bg-sky-400 p-8 rounded-xl shadow-2xl max-w-3xl mx-auto">
+          <div className="flex justify-center mb-6">
+            <img
+              src="/logolerep.png"
+              alt="PAMSIMAS Logo"
+              className="w-50 h-20"
+            />
+          </div>
+          <h1 className="text-4xl font-extrabold mb-4 tracking-tight">
+            Selamat Datang di
+            <span className="text-sky-800"> PAMSIMAS</span>
+          </h1>
+          <p className="text-lg font-light max-w-md mx-auto mb-6">
+            Platform untuk mengelola kebutuhan air bersih desa Anda dengan mudah
+            dan cepat.
+          </p>
 
-          {/* Tombol Pembuatan Aduan */}
-          <a
-            href="/aduanpelanggan"
-            className="flex items-center justify-center py-3 px-6 rounded-full border-2 border-sky-400 text-sky-600 hover:bg-sky-500 hover:text-white transition duration-300 ease-in-out group"
-          >
-            <FiAlertCircle className="mr-3 group-hover:text-white" />
-            Buat Aduan
-          </a>
-
-          {/* Tombol Monitoring Aduan */}
-          <a
-            href="/searchpengaduan"
-            className="flex items-center justify-center py-3 px-6 rounded-full border-2 border-sky-400 text-sky-600 hover:bg-sky-500 hover:text-white transition duration-300 ease-in-out group"
-          >
-            <FiSearch className="mr-3 group-hover:text-white" />
-            Monitoring Aduan
-          </a>
-        </div>
-
-        {/* Footer Copyright */}
-        <div className="mt-8 text-sm text-gray-500 flex items-center justify-center">
-          <span>© 2024 KKNT Desa Lerep. All Rights Reserved.</span>
+          {/* Button Section */}
+          <div className="space-y-6">
+            <a
+              href="/tagihanwarga"
+              className="flex items-center justify-between px-6 py-4 rounded-lg bg-white text-sky-600 shadow-md hover:bg-sky-300 hover:text-sky-800 transition duration-300"
+            >
+              <div className="flex items-center">
+                <FiFileText className="text-2xl mr-4" />
+                <span className="font-semibold">Lihat Tagihan</span>
+              </div>
+              <span className="text-sky-600 group-hover:text-sky-800">→</span>
+            </a>
+            <a
+              href="/aduanpelanggan"
+              className="flex items-center justify-between px-6 py-4 rounded-lg bg-white text-sky-600 shadow-md hover:bg-sky-300 hover:text-sky-800 transition duration-300"
+            >
+              <div className="flex items-center">
+                <FiAlertCircle className="text-2xl mr-4" />
+                <span className="font-semibold">Buat Aduan</span>
+              </div>
+              <span className="text-sky-600 group-hover:text-sky-800">→</span>
+            </a>
+            <a
+              href="/searchpengaduan"
+              className="flex items-center justify-between px-6 py-4 rounded-lg bg-white text-sky-600 shadow-md hover:bg-sky-300 hover:text-sky-800 transition duration-300"
+            >
+              <div className="flex items-center">
+                <FiSearch className="text-2xl mr-4" />
+                <span className="font-semibold">Monitoring Aduan</span>
+              </div>
+              <span className="text-sky-600 group-hover:text-sky-800">→</span>
+            </a>
+          </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="mt-12 text-sm">
+        <p>
+          © 2024 <span className="font-bold">KKNT Desa Lerep</span>. All Rights
+          Reserved.
+        </p>
+      </footer>
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_URL } from "../common/api";
+import { withAuth } from "../utils/routerAuth";
 
 const AdminDashboard = () => {
   const [accounts, setAccounts] = useState([]);
@@ -400,4 +401,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default withAuth(AdminDashboard);

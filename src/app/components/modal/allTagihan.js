@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import GenerateTagihanModal from "./generatetagihanmodal";
+import { API_URL } from "@/app/common/api";
 
 const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
   const [allData, setAllData] = useState([]);
@@ -23,7 +24,7 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
     const fetchRT = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${ROOT_API}/${API_V}/pelangganRTRW`);
+        const response = await fetch(`${API_URL}/pelangganRTRW`);
         const data = await response.json();
         setDataRT(data.data);
         console.log(dataRT);
@@ -42,9 +43,7 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
     console.log(`Sedang memuat tagihan all dari ${rw}`);
     setLoading(true);
     try {
-      const response = await axios.get(
-        `${ROOT_API}/${API_V}/tagihan?alamatRumah=${rw}`
-      );
+      const response = await axios.get(`${API_URL}/tagihan?alamatRumah=${rw}`);
       const data = response.data.data;
 
       if (Array.isArray(data)) {
@@ -192,9 +191,19 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
             onChange={handleFilterChange}
             className="py-2 px-3 border border-gray-300 rounded text-xs sm:text-sm"
           >
-            <option value="">Pilih Bulan</option>
-            <option value="Januari">Januari</option>
-            <option value="Februari">Februari</option>
+            <option value="">--Pilih Bulan--</option>
+            <option value="01">Januari</option>
+            <option value="02">Februari</option>
+            <option value="03">Maret</option>
+            <option value="04">April</option>
+            <option value="05">Mei</option>
+            <option value="06">Juni</option>
+            <option value="07">Juli</option>
+            <option value="08">Agustus</option>
+            <option value="09">September</option>
+            <option value="10">Oktober</option>
+            <option value="11">November</option>
+            <option value="12">Desember</option>
           </select>
         </div>
         <div className="flex flex-col">

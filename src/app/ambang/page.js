@@ -4,10 +4,9 @@ import EditAmbangModal from "../components/modal/editAmbangModal";
 import Toast from "../components/Toast/successToast";
 import { inconsolata } from "../components/Fonts/fonts";
 import { API_URL } from "../common/api";
-import { useRouter } from "next/navigation";
-import { getAuth } from "../utils/routerAuth";
+import { getAuth, withAuth } from "../utils/routerAuth";
 
-export default function AmbangPage() {
+const AmbangPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -15,9 +14,6 @@ export default function AmbangPage() {
   const [selectedDusun, setSelectedDusun] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("");
-
-  // AUTH
-  const router = useRouter();
   const [user, setUser] = useState({
     permissions: {
       pelanggan: {
@@ -82,15 +78,14 @@ export default function AmbangPage() {
   }, []);
 
   const handleEdit = (row) => {
-    setEditData(row); // Set data untuk modal
-    setModalOpen(true); // Buka modal
+    setEditData(row);
+    setModalOpen(true);
   };
 
   const handleDusunSelect = (dusun) => {
     setSelectedDusun(dusun);
   };
 
-  // Filter data berdasarkan dusun yang dipilih
   const filteredData = selectedDusun
     ? data.filter((row) => row.dusunRTRW === selectedDusun)
     : [];
@@ -279,4 +274,5 @@ export default function AmbangPage() {
       </div>
     </div>
   );
-}
+};
+export default withAuth(AmbangPage);

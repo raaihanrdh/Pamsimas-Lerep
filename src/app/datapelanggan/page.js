@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { FiPlus, FiEdit, FiTrash2, FiDownload } from "react-icons/fi";
+import { withAuth } from "../utils/routerAuth";
+import { getAuth } from "../utils/routerAuth";
+import { FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
 import EditModal from "../components/modal/editmodal";
 import CreateModal from "../components/modal/createmodal";
 import QRModal from "../components/modal/QRModal";
@@ -11,12 +12,7 @@ import { inconsolata } from "../components/Fonts/fonts";
 import { API_URL } from "../common/api";
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 25, 50];
-const ROOT_API = process.env.NEXT_PUBLIC_API;
-const API_V = process.env.NEXT_PUBLIC_API_V;
-
-export default function DataPelanggan() {
-  // const API_URL = `${ROOT_API}/${API_V}/pelanggan`;
-
+const DataPelanggan = () => {
   const [dataPelanggan, setDataPelanggan] = useState([]);
   const [qrCode, setQrCode] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,7 +25,6 @@ export default function DataPelanggan() {
   const [error, setError] = useState(null);
   const [refreshData, setRefreshData] = useState(0);
   const [qrModalVisible, setQrModalVisible] = useState(false);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE_OPTIONS[0]);
   const [responseMessage, setResponseMessage] = useState("");
@@ -37,16 +32,52 @@ export default function DataPelanggan() {
   const [toastType, setToastType] = useState("");
   const [dataRT, setDataRT] = useState([]);
   const [selectedDataRT, setSelectedDataRT] = useState("");
+  const [user, setUser] = useState({
+    permissions: {
+      pelanggan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      tagihan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      pengaduan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      ambang: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+    },
+    _id: "",
+    idAkun: "",
+    nama: "",
+    password: "",
+    createdAt: "",
+    updatedAt: "",
+    __v: 0,
+    username: "",
+  });
 
-  //TAMBAHIN
-  const router = useRouter();
   useEffect(() => {
-    //TAMBAHIN
-
+    const authUser = getAuth();
+    setUser(authUser);
+  }, []);
+  useEffect(() => {
     const fetchRT = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${ROOT_API}/${API_V}/pelangganRTRW`);
+        const response = await fetch(`${API_URL}/pelangganRTRW`);
         const data = await response.json();
         setDataRT(data.data);
         console.log(dataRT);
@@ -76,7 +107,6 @@ export default function DataPelanggan() {
       } else {
         throw new Error("Invalid data format received");
       }
-      //------
     } catch (error) {
       setError(`Error: ${error.message}`);
     } finally {
@@ -88,23 +118,17 @@ export default function DataPelanggan() {
   const [excelData, setExcelData] = useState(null);
 
   const fetchGenerate = async () => {
-    try {
+    if (selectedDataRT) {
       const response = await fetch(
         `${API_URL}/generatepelanggan?alamatRumah=${selectedDataRT}`
       );
       const blob = await response.blob();
+
       const url = URL.createObjectURL(blob);
 
-      // Buat elemen anchor untuk mengunduh file
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `pelanggan_${selectedDataRT}.xlsx`;
-      document.body.appendChild(link); // Tambahkan ke DOM sementara
-      link.click(); // Trigger unduhan
-      document.body.removeChild(link); // Hapus elemen setelah unduhan
-      URL.revokeObjectURL(url); // Bebaskan URL blob
-    } catch (error) {
-      alert("Gagal mengunduh file: " + error.message);
+      setExcelData(url);
+    } else {
+      console.log("Data RT Kosong");
     }
   };
 
@@ -145,22 +169,19 @@ export default function DataPelanggan() {
 
     try {
       const response = await fetch(
-        `${API_URL}/pelanggan/${updatedData.idMeteran}/detail`,
+        `${API_URL}/${updatedData.idMeteran}/detail`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updatedData),
         }
       );
-
-      console.log("Response status:", response.status); // Debugging: Status kode respons
-
       if (!response.ok) {
         setToastType("error");
-        setResponseMessage("Update Data Gagal."); // Pesan error saat update gagal
+        setResponseMessage("Update Data Gagal.");
       } else {
         setToastType("success");
-        setResponseMessage("Update Data Berhasil."); // Pesan sukses saat update berhasil
+        setResponseMessage("Update Data Berhasil.");
       }
     } catch (error) {
       setToastType("error");
@@ -171,7 +192,7 @@ export default function DataPelanggan() {
     setShowToast(true);
     setTimeout(() => {
       setShowToast(false);
-    }, 3000); // Hide toast after 3 seconds
+    }, 3000);
   };
 
   const openQRCodeModal = async (idMeteran) => {
@@ -181,7 +202,7 @@ export default function DataPelanggan() {
       );
       const data = await qrCodeResponse.json();
       if (qrCodeResponse.ok) {
-        setQrCode(data.image); // Menyimpan URL gambar QR Code
+        setQrCode(data.image);
         setQrModalVisible(true);
       } else {
         throw new Error("Gagal mengambil QR Code");
@@ -194,15 +215,13 @@ export default function DataPelanggan() {
   };
 
   const closeQRCodeModal = () => setQrModalVisible(false);
-
   const handleCreatePelanggan = async (newData) => {
     try {
-      const response = await fetch(`${API_URL}/pelanggan`, {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newData),
       });
-
       if (!response.ok) {
         setToastType("error");
         setResponseMessage("Tambah Pelanggan Gagal");
@@ -210,7 +229,6 @@ export default function DataPelanggan() {
         setToastType("success");
         setResponseMessage("Tambah Pelanggan Berhasil!");
       }
-
       setRefreshData((prev) => prev + 1);
       closeModal();
     } catch (err) {
@@ -258,10 +276,7 @@ export default function DataPelanggan() {
   const openModal = (type, data = null) => {
     setModalState({ type, data });
   };
-
   const closeModal = () => setModalState({ type: null, data: null });
-
-  // Filter and pagination logic
   const filteredData = dataPelanggan.filter((item) => {
     const matchesSearch =
       item.namaKepalaRumah.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -269,13 +284,10 @@ export default function DataPelanggan() {
     const matchesStatus = !statusFilter || item.statusMeteran === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentData = filteredData.slice(startIndex, endIndex);
-
-  // Pagination controls
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -356,20 +368,29 @@ export default function DataPelanggan() {
                 </option>
               ))}
             </select>
-            <button
-              onClick={() => openModal("create")}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center"
-            >
-              <FiPlus className="mr-2" />
-              Tambah Pelanggan
-            </button>
-            <button
-              onClick={fetchGenerate}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center"
-            >
-              <FiDownload className="mr-2" />
-              Unduh Excel
-            </button>
+            {user.permissions.pelanggan.create === 1 && (
+              <button
+                onClick={() => fetchGenerate()}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center"
+              >
+                <FiEdit className="mr-2" />
+                Generate Excel
+              </button>
+            )}
+            {user.permissions.pelanggan.create === 1 && (
+              <button
+                onClick={() => openModal("create")}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center"
+              >
+                <FiPlus className="mr-2" />
+                Tambah Pelanggan
+              </button>
+            )}
+            {excelData && user.permissions.pelanggan.create === 1 && (
+              <a href={excelData} download={`pelanggan_${selectedDataRT}.xlsx`}>
+                Download Excel
+              </a>
+            )}
           </div>
 
           <div className="overflow-x-auto shadow-lg rounded-lg">
@@ -425,20 +446,25 @@ export default function DataPelanggan() {
                           </button>
                         </td>
                         <td className="px-6 py-4 flex gap-2">
-                          <button
-                            onClick={() => openModal("edit", item)}
-                            className="bg-sky-500 text-white hover:bg-sky-600 py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
-                          >
-                            <FiEdit className="text-white" /> Edit
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleDeletePelanggan(item.idMeteran)
-                            }
-                            className="bg-red-500 text-white hover:bg-red-600 py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
-                          >
-                            <FiTrash2 className="text-white" /> Hapus
-                          </button>
+                          {user.permissions.pelanggan.update === 1 && (
+                            <button
+                              onClick={() => openModal("edit", item)}
+                              className="bg-sky-500 text-white hover:bg-sky-600 py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
+                            >
+                              <FiEdit className="text-white" /> Edit
+                            </button>
+                          )}
+
+                          {user.permissions.pelanggan.delete === 1 && (
+                            <button
+                              onClick={() =>
+                                handleDeletePelanggan(item.idMeteran)
+                              }
+                              className="bg-red-500 text-white hover:bg-red-600 py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
+                            >
+                              <FiTrash2 className="text-white" /> Hapus
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))
@@ -560,4 +586,5 @@ export default function DataPelanggan() {
       )}
     </div>
   );
-}
+};
+export default withAuth(DataPelanggan);

@@ -12,9 +12,11 @@ import {
   FiMessageSquare,
   FiUser,
   FiBookOpen,
+  FiUserPlus,
 } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { API_URL } from "@/app/common/api";
 
 export default function Navbar({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -26,13 +28,13 @@ export default function Navbar({ children }) {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:4000/api/v1/logout", {
+      const response = await fetch(`${API_URL}/logout`, {
         method: "GET",
       });
 
       if (response.ok) {
         Cookies.remove("user");
-        router.push("/"); // Redirect ke halaman login
+        router.push("/");
       } else {
         console.error("Logout failed");
       }
@@ -49,7 +51,7 @@ export default function Navbar({ children }) {
         } md:translate-x-0 md:w-64 w-3/4 z-30`}
       >
         <div className="p-5">
-          <h2 className="text-2xl font-semibold">Logo</h2>
+          <img src="/logolerep.png" alt="PAMSIMAS Logo" className="w-25 h-10" />
           <nav className="flex flex-col gap-5 mt-10">
             <Link
               href="/dashboard"
@@ -82,7 +84,7 @@ export default function Navbar({ children }) {
               href="/akun"
               className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
             >
-              <FiUser className="pr-2" size={28} />
+              <FiUsers className="pr-2" size={28} />
               Settings Akun
             </Link>
             <Link
@@ -91,13 +93,6 @@ export default function Navbar({ children }) {
             >
               <FiMessageSquare className="pr-2" size={28} />
               Pengaduan
-            </Link>
-            <Link
-              href="/aduanpelanggan"
-              className="flex py-2 px-4 items-center border border-white shadow-lg rounded hover:bg-gray-600 transition"
-            >
-              <FiBookOpen className="pr-2" size={28} />
-              Data Pengaduan
             </Link>
             <button
               onClick={handleLogout}
@@ -118,50 +113,51 @@ export default function Navbar({ children }) {
           {children}
         </main>
       </div>
+
       <div className="md:hidden fixed bottom-0 left-0 w-full bg-sky-600 text-white flex justify-around py-3 rounded-t-lg shadow-lg">
-        <Link href="/Dashboard">
-          <div className="flex flex-col items-center justify-center">
+        <Link href="/dashboard">
+          <div className="flex flex-col items-center justify-center space-y-1">
             <FiHome
-              size={28}
+              size={24}
               className="transition-all duration-300 ease-in-out transform hover:scale-110 hover:text-sky-200"
             />
-            <span className="text-xs mt-1">Home</span>
+            <span className="text-xs font-semibold">Home</span>
           </div>
         </Link>
-        <Link href="/DataPelanggan">
-          <div className="flex flex-col items-center justify-center">
+        <Link href="/datapelanggan">
+          <div className="flex flex-col items-center justify-center space-y-1">
             <FiBook
-              size={28}
+              size={24}
               className="transition-all duration-300 ease-in-out transform hover:scale-110 hover:text-sky-200"
             />
-            <span className="text-xs mt-1">Pelanggan</span>
+            <span className="text-xs font-semibold">Data</span>
           </div>
         </Link>
-        <Link href="/Tagihan">
-          <div className="flex flex-col items-center justify-center">
+        <Link href="/tagihan">
+          <div className="flex flex-col items-center justify-center space-y-1">
             <FiList
-              size={28}
+              size={24}
               className="transition-all duration-300 ease-in-out transform hover:scale-110 hover:text-sky-200"
             />
-            <span className="text-xs mt-1">Tagihan</span>
+            <span className="text-xs font-semibold">Tagihan</span>
           </div>
         </Link>
-        <Link href="/Pengaduan">
-          <div className="flex flex-col items-center justify-center">
+        <Link href="/pengaduan">
+          <div className="flex flex-col items-center justify-center space-y-1">
             <FiMessageCircle
-              size={28}
+              size={24}
               className="transition-all duration-300 ease-in-out transform hover:scale-110 hover:text-sky-200"
             />
-            <span className="text-xs mt-1">Pengaduan</span>
+            <span className="text-xs font-semibold">Aduan</span>
           </div>
         </Link>
-        <Link href="/AduanPelanggan">
-          <div className="flex flex-col items-center justify-center">
-            <FiUsers
-              size={28}
+        <Link href="/ambang">
+          <div className="flex flex-col items-center justify-center space-y-1">
+            <FiSettings
+              size={24}
               className="transition-all duration-300 ease-in-out transform hover:scale-110 hover:text-sky-200"
             />
-            <span className="text-xs mt-1">Aduan</span>
+            <span className="text-xs font-semibold">Set Harga</span>
           </div>
         </Link>
       </div>
