@@ -69,7 +69,7 @@ const AmbangPage = () => {
       const response = await fetch(`${API_URL}/ambang`);
       const result = await response.json();
       if (result.data) {
-        setData(result.data);
+        setData(result.data.sort((a, b) => a.dusunRTRW.localeCompare(b.dusunRTRW)));
       }
     } catch (error) {
       console.error("Error fetching ambang data:", error);

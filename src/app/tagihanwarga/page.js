@@ -18,7 +18,7 @@ const TagihanPelanggan = () => {
       try {
         const response = await fetch(`${API_URL}/pelangganRTRW`);
         const data = await response.json();
-        setDataRT(data.data);
+        setDataRT(data.data.sort((a, b) => a._id.localeCompare(b._id)));
       } catch (err) {
         setError("Gagal mengambil data RT/RW");
       }

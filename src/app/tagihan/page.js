@@ -221,8 +221,7 @@ const TagihanBulanan = () => {
       try {
         const response = await fetch(`${API_URL}/pelangganRTRW`);
         const data = await response.json();
-        setDataRT(data.data);
-        console.log(data);
+        setDataRT(data.data.sort((a, b) => a._id.localeCompare(b._id)));
       } catch (err) {
       } finally {
         setLoading(false);
@@ -445,7 +444,7 @@ const TagihanBulanan = () => {
                 totalTagihan = meteranHitungan
                 factorTotalTagihan = dataAmbang.hargaPerKubik.meteranPribadi
                 biayaAdmin = dataAmbang.biayaAdmin.meteranPribadi
-                totalTagihan = (((totalTagihan + dataAmbang.ambangMinimum.meteranPribadi) * factorTotalTagihan) + biayaAdmin).toString()
+                totalTagihan = (dataAmbang.nominalMinimum.meteranPribadi + ((totalTagihan - dataAmbang.ambangMinimum.meteranPribadi) * factorTotalTagihan) + biayaAdmin).toString()
               }
           } else {
               if(meteranHitungan <= dataAmbang.ambangMinimum.meteranUsaha) {
@@ -454,7 +453,7 @@ const TagihanBulanan = () => {
                 totalTagihan = meteranHitungan
                 factorTotalTagihan = dataAmbang.hargaPerKubik.meteranUsaha
                 biayaAdmin = dataAmbang.biayaAdmin.meteranUsaha
-                totalTagihan = (((totalTagihan + dataAmbang.ambangMinimum.meteranUsaha) * factorTotalTagihan) + biayaAdmin).toString()
+                totalTagihan = (dataAmbang.nominalMinimum.meteranUsaha + ((totalTagihan - dataAmbang.ambangMinimum.meteranUsaha) * factorTotalTagihan) + biayaAdmin).toString()
               }
           }
       } else {
@@ -464,7 +463,7 @@ const TagihanBulanan = () => {
           totalTagihan = meteranHitungan
           factorTotalTagihan = dataAmbang.hargaPerKubik.meteranPribadi
           biayaAdmin = dataAmbang.biayaAdmin.meteranPribadi
-          totalTagihan = (((totalTagihan + dataAmbang.ambangMinimum.meteranPribadi) * factorTotalTagihan) + biayaAdmin).toString()
+          totalTagihan = (dataAmbang.nominalMinimum.meteranUsaha + ((totalTagihan - dataAmbang.ambangMinimum.meteranUsaha) * factorTotalTagihan) + biayaAdmin).toString()
         }
       }
 
@@ -681,10 +680,10 @@ const TagihanBulanan = () => {
               <thead className="bg-sky-400 text-white">
                 <tr>
                   <th className="px-6 py-4 text-center border-b border-gray-300">
-                    ID Tagihan
+                    ID Meteran
                   </th>
                   <th className="px-6 py-4 text-center border-b border-gray-300">
-                    ID Meteran
+                    Nama Pelanggan
                   </th>
                   <th className="px-6 py-4 text-center border-b border-gray-300">
                     Meteran Sebelumnya
@@ -718,10 +717,10 @@ const TagihanBulanan = () => {
                     }`}
                   >
                     <td className="px-6 py-4 text-center border-b border-gray-300">
-                      {tagihan.idTagihan}
+                      {tagihan.idMeteran}
                     </td>
                     <td className="px-6 py-4 text-center border-b border-gray-300">
-                      {tagihan.idMeteran}
+                      {tagihan.namaKepalaRumah}
                     </td>
                     <td className="px-6 py-4 text-center border-b border-gray-300">
                       {tagihan.meteranSebelumnya}

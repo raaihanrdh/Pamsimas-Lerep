@@ -79,7 +79,7 @@ const DataPelanggan = () => {
       try {
         const response = await fetch(`${API_URL}/pelangganRTRW`);
         const data = await response.json();
-        setDataRT(data.data);
+        setDataRT(data.data.sort((a, b) => a._id.localeCompare(b._id)));
         console.log(dataRT);
       } catch (err) {
         setError(`Error fetching RW data: ${err.message}`);
@@ -402,6 +402,7 @@ const DataPelanggan = () => {
                     <th className="px-6 py-3 text-left">ID Meteran</th>
                     <th className="px-6 py-3 text-left">Nama Kepala Rumah</th>
                     <th className="px-6 py-3 text-left">Alamat Rumah</th>
+                    <th className="px-6 py-3 text-left">Jenis Meteran</th>
                     <th className="px-6 py-3 text-left">Status Meteran</th>
                     <th className="px-6 py-3 text-left">QR</th>
                     <th className="px-6 py-3 text-left">Aksi</th>
@@ -426,6 +427,17 @@ const DataPelanggan = () => {
                         <td className="px-6 py-4">{item.idMeteran}</td>
                         <td className="px-6 py-4">{item.namaKepalaRumah}</td>
                         <td className="px-6 py-4">{item.alamatRumah}</td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                              item.jenisMeteran === "Pribadi"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {item.jenisMeteran}
+                          </span>
+                        </td>
                         <td className="px-6 py-4">
                           <span
                             className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${

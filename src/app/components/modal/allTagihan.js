@@ -26,7 +26,7 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
       try {
         const response = await fetch(`${API_URL}/pelangganRTRW`);
         const data = await response.json();
-        setDataRT(data.data);
+        setDataRT(data.data.sort((a, b) => a._id.localeCompare(b._id)));
         console.log(dataRT);
       } catch (err) {
         setError(`Error fetching RW data: ${err.message}`);
@@ -253,8 +253,8 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
           <thead className="bg-sky-400 text-white">
             <tr>
               {[
-                "ID Tagihan",
                 "ID Meteran",
+                "Nama Pelanggan",
                 "Bulan",
                 "Tahun",
                 "Meteran Sebelumnya",
@@ -277,8 +277,8 @@ const ModalAllData = ({ closeModal, showGenerateExcelModal, alamatRumah }) => {
                 className="hover:bg-sky-100 border-b border-gray-200"
               >
                 {[
-                  item.idTagihan,
                   item.idMeteran,
+                  item.namaKepalaRumah,
                   item.bulanTagihan,
                   item.tahunTagihan,
                   item.meteranSebelumnya,
