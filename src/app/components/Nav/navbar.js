@@ -10,9 +10,6 @@ import {
   FiLogOut,
   FiSettings,
   FiMessageSquare,
-  FiUser,
-  FiBookOpen,
-  FiUserPlus,
 } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
