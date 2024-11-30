@@ -1,12 +1,13 @@
 import { useState } from "react";
 
-export default function CreateModal({ closeModal, saveData }) {
+export default function CreateModal({ closeModal, saveData, rw }) {
   const [namaKepalaRumah, setNamaKepalaRumah] = useState("");
   const [alamatRumah, setAlamatRumah] = useState("");
   const [statusMeteran, setStatusMeteran] = useState("Aktif");
+  const [jenisMeteran, setJenisMeteran] = useState("Pribadi");
 
   const handleCreate = () => {
-    const newData = { namaKepalaRumah, alamatRumah, statusMeteran };
+    const newData = { namaKepalaRumah, alamatRumah, statusMeteran, jenisMeteran };
     saveData(newData);
     closeModal();
   };
@@ -36,13 +37,32 @@ export default function CreateModal({ closeModal, saveData }) {
             <label className="block text-sm font-medium text-gray-600">
               Alamat Rumah
             </label>
-            <textarea
-              value={alamatRumah}
-              onChange={(e) => setAlamatRumah(e.target.value)}
-              className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
-              placeholder="Masukkan alamat rumah"
-              rows={3}
-            ></textarea>
+            <select
+                value={alamatRumah}
+                onChange={(e) => setAlamatRumah(e.target.value)}
+                className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              >
+                <option>Pilih Alamat Rumah</option>
+                { rw && rw.map((rw) => {
+                  return(
+                    <option value={rw._id}>{rw._id}</option>
+                  )
+                }) }
+              </select>
+          </div>
+          {/* Jenis Meteran */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600">
+              Jenis Meteran
+            </label>
+            <select
+              value={jenisMeteran}
+              onChange={(e) => setJenisMeteran(e.target.value)}
+              className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+            >
+              <option value="Pribadi">Pribadi</option>
+              <option value="Usaha">Usaha</option>
+            </select>
           </div>
           {/* Status Meteran */}
           <div>

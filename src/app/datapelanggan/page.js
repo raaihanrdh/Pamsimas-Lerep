@@ -572,7 +572,7 @@ const DataPelanggan = () => {
       )}
 
       {modalState.type === "create" && (
-        <CreateModal closeModal={closeModal} saveData={handleCreatePelanggan} />
+        <CreateModal closeModal={closeModal} saveData={handleCreatePelanggan} rw={dataRT} />
       )}
 
       {modalState.type === "edit" && (
@@ -580,6 +580,7 @@ const DataPelanggan = () => {
           closeModal={closeModal}
           saveData={handleSaveEdit}
           data={modalState.data}
+          rw={dataRT}
         />
       )}
       {qrModalVisible && (

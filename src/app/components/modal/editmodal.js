@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function EditModal({ closeModal, saveData, data }) {
+export default function EditModal({ closeModal, saveData, data, rw }) {
   const [formData, setFormData] = useState(data); // Menyimpan data awal ke state
 
   // Fungsi untuk menangani perubahan input
@@ -16,6 +16,7 @@ export default function EditModal({ closeModal, saveData, data }) {
     const updatedData = {
       idMeteran: formData.idMeteran,
       namaKepalaRumah: formData.namaKepalaRumah,
+      jenisMeteran: formData.jenisMeteran,
       statusMeteran: formData.statusMeteran,
       // Tambahkan data lainnya yang relevan
     };
@@ -45,21 +46,40 @@ export default function EditModal({ closeModal, saveData, data }) {
             />
           </div>
 
-          {/* Input Alamat Rumah */}
+          {/* Alamat Rumah */}
           <div>
             <label className="block text-sm font-medium text-gray-600">
               Alamat Rumah
             </label>
-            <textarea
-              name="alamatRumah"
-              value={formData.alamatRumah}
-              onChange={handleChange}
-              className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
-              placeholder="Masukkan alamat rumah"
-              rows={3}
-            ></textarea>
+            <select
+                name="alamatRumah"
+                value={formData.alamatRumah}
+                onChange={handleChange}
+                className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              >
+                <option>Pilih Alamat Rumah</option>
+                { rw && rw.map((rw) => {
+                  return(
+                    <option key={rw._id} value={rw._id}>{rw._id}</option>
+                  )
+                }) }
+              </select>
           </div>
-
+          {/* Jenis Meteran */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600">
+              Jenis Meteran
+            </label>
+            <select
+              name="jenisMeteran"
+              value={formData.jenisMeteran}
+              onChange={handleChange}
+              className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+            >
+              <option key="Pribadi" value="Pribadi">Pribadi</option>
+              <option key="Usaha" value="Usaha">Usaha</option>
+            </select>
+          </div>
           {/* Input Status Meteran */}
           <div>
             <label className="block text-sm font-medium text-gray-600">
