@@ -17,8 +17,8 @@ const Page = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const handleSearch = async () => {
-    if (!idPengaduanSearch && !idMeteranSearch) {
+  const handleSearchByPengaduan = async () => {
+    if (!idPengaduanSearch) {
       setToastType("error");
       setResponseMessage("Silakan masukkan ID Pengaduan atau ID Meteran");
       setShowToast(true);
@@ -27,15 +27,50 @@ const Page = () => {
 
     try {
       let response;
-      if (idPengaduanSearch) {
-        // Jika input adalah ID Pengaduan
-        response = await fetch(
-          `${API_URL}/pengaduan/${idPengaduanSearch}/detail`
+      response = await fetch(
+        `${API_URL}/pengaduan/${idPengaduanSearch}/detail`
+      );
+
+      const data = await response.json();
+      console.log(data);
+
+      if (
+        data.data &&
+        (Array.isArray(data.data) ? data.data.length > 0 : data.data)
+      ) {
+        const fetchedData = Array.isArray(data.data) ? data.data : [data.data]; // Handle data tunggal & array
+        const sortedData = fetchedData.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-      } else if (idMeteranSearch) {
-        // Jika input adalah ID Meteran
-        response = await fetch(`${API_URL}/pengaduan/${idMeteranSearch}`);
+        setPengaduan(sortedData);
+        setFilteredPengaduan(sortedData);
+        setCurrentPage(1);
+      } else {
+        setToastType("error");
+        setResponseMessage("Tidak ada pengaduan ditemukan untuk ID tersebut");
+        setShowToast(true);
+        setPengaduan([]);
+        setFilteredPengaduan([]);
       }
+    } catch (error) {
+      setToastType("error");
+      setResponseMessage("Terjadi kesalahan saat mencari pengaduan");
+      setShowToast(true);
+    }
+  };
+
+  const handleSearchById = async () => {
+    if (!idMeteranSearch) {
+      setToastType("error");
+      setResponseMessage("Silakan masukkan ID Pengaduan atau ID Meteran");
+      setShowToast(true);
+      return;
+    }
+
+    try {
+      let response;
+      // Jika input adalah ID Meteran
+      response = await fetch(`${API_URL}/pengaduan/${idMeteranSearch}`);
 
       const data = await response.json();
       console.log(data);
@@ -109,7 +144,7 @@ const Page = () => {
                 onChange={(e) => setIdPengaduanSearch(e.target.value)}
               />
               <button
-                onClick={handleSearch}
+                onClick={handleSearchByPengaduan}
                 className="bg-sky-400 hover:bg-sky-500 text-white py-3 px-6 rounded-r-lg"
               >
                 Cari
@@ -132,7 +167,7 @@ const Page = () => {
                 onChange={(e) => setIdMeteranSearch(e.target.value)}
               />
               <button
-                onClick={handleSearch}
+                onClick={handleSearchById}
                 className="bg-sky-400 hover:bg-sky-500 text-white py-3 px-6 rounded-r-lg"
               >
                 Cari

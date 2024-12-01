@@ -276,6 +276,7 @@ const TagihanBulanan = () => {
 
   const fetchTagihanByRT = async (rw) => {
     fetchAmbangByRT(rw)
+    setSelectedDataRT(rw);
     setDataTagihan([]); // Kosongkan data sebelumnya untuk mencegah lag saat refresh
     setLoading(true);
     try {
@@ -419,6 +420,7 @@ const TagihanBulanan = () => {
   const handleEditTagihan = (tagihan) => {
     setEditingTagihan(tagihan);
     fetchJenisMeteranSelected(tagihan.idMeteran)
+    fetchAmbangByRT(tagihan.alamatRumah)
   };
 
   const handleChangeInput = (e) => {

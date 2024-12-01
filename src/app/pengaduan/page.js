@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Nav/navbar";
 import Toast from "../components/Toast/successToast";
 import { API_URL } from "../common/api";
-import { withAuth } from "../utils/routerAuth";
+import { withAuth, getAuth } from "../utils/routerAuth";
+import { FiTrash2 } from "react-icons/fi";
 
 const PengaduanPage = () => {
   const [pengaduan, setPengaduan] = useState([]);
@@ -20,6 +21,48 @@ const PengaduanPage = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // Default 10 items per page
+
+  const [user, setUser] = useState({
+    permissions: {
+      pelanggan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      tagihan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      pengaduan: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+      ambang: {
+        create: 0,
+        read: 0,
+        update: 0,
+        delete: 0,
+      },
+    },
+    _id: "",
+    idAkun: "",
+    nama: "",
+    password: "",
+    createdAt: "",
+    updatedAt: "",
+    __v: 0,
+    username: "",
+  });
+
+  useEffect(() => {
+    const authUser = getAuth();
+    setUser(authUser);
+  }, []);
 
   useEffect(() => {
     const fetchPengaduan = async () => {
@@ -165,6 +208,38 @@ const PengaduanPage = () => {
     }
   };
 
+  const handleDeletePengaduan = async (idPengaduan) => {
+    if (!window.confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/pengaduan/${idPengaduan}`, {
+        method: "DELETE",
+      });
+
+      if (!response.status === 200) {
+        setToastType("error");
+        setResponseMessage(response.message || "Gagal mengirim pengaduan.");
+      } else {
+        setToastType("success");
+        setResponseMessage("Pengaduan berhasil dihapus!");
+      }
+    } catch (err) {
+      setErrors(err);
+      setToastType("error");
+      setResponseMessage(err || "Gagal mengirim pengaduan.");
+    } finally {
+      setLoading(false);
+      setShowToast(true);
+      setToastType("success");
+      setResponseMessage("Pengaduan berhasil dihapus!");
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+    }
+  };
+
   return (
     <div className="flex-1 px-6 py-8">
       <h2 className="text-3xl font-semibold mb-8">Halaman Pengaduan</h2>
@@ -286,9 +361,11 @@ const PengaduanPage = () => {
                 <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
                   Status
                 </th>
-                <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
-                  Aksi
-                </th>
+                {(user.permissions.pengaduan.update === 1 || user.permissions.pengaduan.delete === 1) && (
+                  <th className="px-6 py-4 text-center border-b border-gray-300 text-sm font-medium">
+                    Aksi
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -321,23 +398,38 @@ const PengaduanPage = () => {
                       {item.statusAduan}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-center border-b border-gray-300">
-                    <div className="relative">
-                      <select
-                        className="bg-white border border-gray-300 rounded-lg shadow-sm py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200 ease-in-out"
-                        onChange={(e) =>
-                          handleStatusChange(item.idPengaduan, e.target.value)
-                        }
-                        defaultValue=""
-                      >
-                        <option value="" disabled>
-                          Ubah Status
-                        </option>
-                        <option value="Diproses">Diproses</option>
-                        <option value="Selesai">Selesai</option>
-                      </select>
-                    </div>
-                  </td>
+                  {(user.permissions.pengaduan.update === 1 || user.permissions.pengaduan.delete === 1) && (
+                    <td className="px-6 py-4 text-center border-b border-gray-300">
+                      <div className="relative">
+                        {user.permissions.pengaduan.update === 1 && (
+                          <select
+                            className="bg-white border border-gray-300 rounded-lg shadow-sm py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200 ease-in-out"
+                            onChange={(e) =>
+                              handleStatusChange(item.idPengaduan, e.target.value)
+                            }
+                            defaultValue=""
+                          >
+                            <option value="" disabled>
+                              Ubah Status
+                            </option>
+                            <option value="Diproses">Diproses</option>
+                            <option value="Selesai">Selesai</option>
+                          </select>
+                        )}
+                        <br/>
+                        {user.permissions.pengaduan.delete === 1 && (
+                              <button
+                                onClick={() =>
+                                  handleDeletePengaduan(item.idPengaduan)
+                                }
+                                className="btn-sm bg-red-500 text-white hover:bg-red-600 py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
+                              >
+                                <FiTrash2 className="text-white" /> Hapus
+                              </button>
+                            )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

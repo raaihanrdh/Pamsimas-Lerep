@@ -10,6 +10,7 @@ import {
   FiAlertCircle,
   FiUser,
   FiLogOut,
+  FiUsers,
 } from "react-icons/fi";
 import {
   Chart as ChartJS,
@@ -24,6 +25,7 @@ import {
   Legend,
 } from "chart.js";
 import { API_URL } from "../common/api";
+import Link from "next/link";
 
 // Mendaftarkan komponen Chart.js
 ChartJS.register(
@@ -195,6 +197,13 @@ const Page = () => {
           <FiLogOut className=" flex justify-cente mr-2" />
           Logout
         </button>
+        <Link
+          href="/akun"
+          className="md:hidden flex bg-white fitems-center text-sky-600 px-4 py-2 rounded-full hover:bg-400-600 transition border border-sky-800 duration-300 mb-6"
+        >
+          <FiUsers className="pr-2" size={28} />
+          Akun
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

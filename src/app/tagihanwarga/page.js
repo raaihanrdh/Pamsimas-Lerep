@@ -13,6 +13,21 @@ const TagihanPelanggan = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const angkaBulan = {
+    "01": "Januari",
+    "02": "Februari",
+    "03": "Maret",
+    "04": "April",
+    "05": "Mei",
+    "06": "Juni",
+    "07": "Juli",
+    "08": "Agustus",
+    "09": "September",
+    "10": "Oktober",
+    "11": "November",
+    "12": "Desember",
+  }
+
   useEffect(() => {
     const fetchRT = async () => {
       try {
@@ -28,6 +43,7 @@ const TagihanPelanggan = () => {
   }, []);
 
   const fetchTagihan = async () => {
+    setDataTagihan([])
     if (!selectedRT || !idMeteran) {
       setError("Silakan pilih RT/RW dan masukkan ID Meteran");
       return;
@@ -43,7 +59,7 @@ const TagihanPelanggan = () => {
       const data = response.data.data;
 
       if (Array.isArray(data)) {
-        setDataTagihan(data);
+        setDataTagihan(data.sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
       } else {
         setError("Tidak ada data tagihan ditemukan");
         setDataTagihan([]);
@@ -148,6 +164,8 @@ const TagihanPelanggan = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     {[
                       { label: "ID Meteran", value: tagihan.idMeteran },
+                      { label: "Nama Pelanggan", value: tagihan.namaKepalaRumah },
+                      { label: "Tahun - Bulan", value: `${tagihan.tahunTagihan} - ${angkaBulan[tagihan.bulanTagihan]}` },
                       {
                         label: "Meteran Sebelumnya",
                         value: tagihan.meteranSebelumnya,
